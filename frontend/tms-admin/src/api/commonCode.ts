@@ -1,9 +1,9 @@
 import { api, unwrap } from './client';
-import type { CommonCodeGroup, CommonCodeItem, ResponseDto } from './types';
+import type { CommonCodeGroup, CommonCodeItem, ResponseDto, ValidCode } from './types';
 
 export const commonCodeApi = {
   validCodes: (comCodeGroupCd: string) =>
-    unwrap<CommonCodeItem[]>(api.get<ResponseDto<CommonCodeItem[]>>(`/common-code/valid-common-codes/${comCodeGroupCd}`)),
+    unwrap<ValidCode[]>(api.get<ResponseDto<ValidCode[]>>(`/common-code/valid-common-codes/${comCodeGroupCd}`)),
   groups: (params: { comCodeGroupCd?: string; comCodeGroupName?: string }) =>
     unwrap<CommonCodeGroup[]>(api.get<ResponseDto<CommonCodeGroup[]>>('/common-code/common-code-groups', { params })),
   createGroup: (body: { comCodeGroupCd: string; comCodeGroupName: string }) =>

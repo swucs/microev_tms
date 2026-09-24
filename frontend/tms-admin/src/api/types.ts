@@ -99,6 +99,13 @@ export interface DispatchSummary {
 }
 
 // 공통코드
+export interface ValidCode {
+  comCodeGroupCd: string;
+  comCodeCd: string;
+  comCodeName: string;
+  sortOrder: number;
+}
+
 export interface CommonCodeGroup {
   comCodeGroupCd: string;
   comCodeGroupName: string;
