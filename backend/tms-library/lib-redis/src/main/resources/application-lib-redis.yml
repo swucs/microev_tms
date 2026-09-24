@@ -5,7 +5,7 @@ spring:
       on-profile: local
   data:
     redis:
-      host: 10.28.3.236
+      host: localhost
       port: 6379
 ---
 spring:
@@ -14,5 +14,5 @@ spring:
       on-profile: dev
   data:
     redis:
-      host: obigo-redis-cluster.iiiskg.ng.0001.apn2.cache.amazonaws.com
+      host: localhost
       port: 6379
