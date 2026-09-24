@@ -15,9 +15,6 @@ project(':tms-core').projectDir = file('tms-library/tms-core')
 include 'lib-redis'
 project(':lib-redis').projectDir = file('tms-library/lib-redis')
 
-include 'lib-mqtt'
-project(':lib-mqtt').projectDir = file('tms-library/lib-mqtt')
-
 include 'tms-admin'
 project(':tms-admin').projectDir = file('tms-admin')
 

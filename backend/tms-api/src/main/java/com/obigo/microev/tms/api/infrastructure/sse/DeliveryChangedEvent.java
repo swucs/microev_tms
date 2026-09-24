@@ -1,4 +1,4 @@
-package com.obigo.microev.tms.lib.vo;
+package com.obigo.microev.tms.api.infrastructure.sse;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MqttDeliveryMessage {
+public class DeliveryChangedEvent {
     private Long deliverySeq;
     private Long driverSeq;
     private String deliveryStatusCd;

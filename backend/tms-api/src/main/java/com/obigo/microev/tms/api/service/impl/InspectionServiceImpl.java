@@ -18,8 +18,8 @@ import com.obigo.microev.tms.core.domain.mapper.DispatchMapper;
 import com.obigo.microev.tms.core.domain.mapper.vo.delivery.WaybillResult;
 import com.obigo.microev.tms.core.domain.mapper.vo.dispatch.DispatchDetailResult;
 import com.obigo.microev.tms.core.exception.InvalidRequestException;
-import com.obigo.microev.tms.lib.publisher.MqttPublisher;
-import com.obigo.microev.tms.lib.vo.MqttDeliveryMessage;
+import com.obigo.microev.tms.api.infrastructure.sse.DeliveryChangedEvent;
+import com.obigo.microev.tms.api.infrastructure.sse.DeliveryEventNotifier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -42,7 +42,7 @@ public class InspectionServiceImpl implements InspectionService {
     private final DeliveryHistoryMapper deliveryHistoryMapper;
     private final InspectionConverter inspectionConverter;
     private final DeliveryConverter deliveryConverter;
-    private final MqttPublisher mqttPublisher;
+    private final DeliveryEventNotifier deliveryEventNotifier;
 
 
 
@@ -113,8 +113,8 @@ public class InspectionServiceImpl implements InspectionService {
         //배송이력 추가
         this.createDevlieryHistory(delivery);
 
-        //MQTT 이벤트 전송
-        this.sendMqttDeliveryEvent(delivery);
+        //배송상태 변경 이벤트 전송(SSE)
+        this.sendDeliveryEvent(delivery);
 
 
         //해당 배차상태가 배송중이 아니라면 배송중으로 변경
@@ -164,8 +164,8 @@ public class InspectionServiceImpl implements InspectionService {
         //배송이력 추가
         this.createDevlieryHistory(delivery);
 
-        //MQTT 이벤트 전송
-        this.sendMqttDeliveryEvent(delivery);
+        //배송상태 변경 이벤트 전송(SSE)
+        this.sendDeliveryEvent(delivery);
 
         //해당 배차상태가 검수완료라면 배차상태를 배차확정으로 변경
         Dispatch dispatch = dispatchMapper.findById(delivery.getDispatchSeq())
@@ -189,12 +189,12 @@ public class InspectionServiceImpl implements InspectionService {
     }
 
     /**
-     * 배송정보가 변경되었음을 알리는 MQTT 이벤트 전송
+     * 배송정보가 변경되었음을 알리는 SSE 이벤트 전송
      * @param delivery
      */
-    private void sendMqttDeliveryEvent(Delivery delivery) {
-        MqttDeliveryMessage mqttDeliveryMessage = deliveryConverter.toMqttDeliveryMessage(delivery);
-        mqttPublisher.sendChangedDelivery(delivery.getDriverSeq(), mqttDeliveryMessage);
+    private void sendDeliveryEvent(Delivery delivery) {
+        DeliveryChangedEvent event = deliveryConverter.toDeliveryChangedEvent(delivery);
+        deliveryEventNotifier.publish(delivery.getDriverSeq(), event);
     }
 
 }

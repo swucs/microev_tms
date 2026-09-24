@@ -13,4 +13,3 @@ spring:
       - classpath:application-core-jwt.yml
       - classpath:application-core-aws.yml
       - classpath:application-lib-redis.yml
-      - classpath:application-lib-mqtt.yml

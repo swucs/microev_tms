@@ -8,7 +8,7 @@
 - 명령은 `backend/` 안에서 실행. 래퍼에 실행 비트가 없어 `./gradlew` 대신 `sh gradlew` 사용.
 
 ## 모듈 경계
-- 루트 `settings.gradle` 포함 모듈만 빌드 대상: `:tms-admin`, `:tms-api`, `:tms-core`(경로 `tms-library/tms-core`), `:lib-redis`, `:lib-mqtt`.
+- 루트 `settings.gradle` 포함 모듈만 빌드 대상: `:tms-admin`, `:tms-api`, `:tms-core`(경로 `tms-library/tms-core`), `:lib-redis`.
 - 자바 21 고정, 스프링 부트 3.2.0. 버전 통일·업그레이드 임의 시도 금지.
 
 ## 실행·빌드 명령
@@ -28,7 +28,7 @@
 - `ENC(...)` 값은 실행 시 복호화되며 키는 환경변수 `JASYPT_KEY`에서 읽음(`tms-core/.../config/JasyptConfig.java:14`). 로컬 키는 `TEST_KEY`.
 - 보안 규칙: 평문 비번·키는 소스·설정·스크립트·엠디 어디에도 기록 금지, 전달은 환경변수로만. 암호화는 `PBEWithMD5AndDES`·반복 1000 (`JasyptConfig.java:14-26`과 동일 조건).
 - `local` 블록만 로컬 값으로 교체했고 `dev` 블록은 원본 유지. `dev` 값을 건드리면 운영 키 복호화가 깨지므로 금지.
-- 로컬 더미 주의: 에스쓰리·카카오·엠큐티 `local` 키는 부팅용 임시값이라 로컬에서 사진 업로드·주소 검색·푸시 알림은 실패함. 디비·로그인은 정상 동작.
+- 로컬 더미 주의: 에스쓰리·카카오 `local` 키는 부팅용 임시값이라 로컬에서 사진 업로드·주소 검색은 실패함. 디비·로그인은 정상 동작. 엠큐티는 제거됨(배송상태 알림은 `tms-api` 내부 SSE 직접 발행).
 
 ## 데이터베이스
 - 포스트그레스 전용(`database/createTable.sql:4` `BIGSERIAL`, `:32` `COMMENT ON`, `:589` `NULLS LAST`). 테이블 14개, 접두 `t_`, 기본키 `*_seq`, 외래키는 파일 하단(`createTable.sql:1212-1406`)에 모음.
@@ -39,7 +39,7 @@
 
 ## 데이터 접근 규칙
 - 마이바티스 전용: 인터페이스 `tms-core/.../domain/mapper`, 실행문 `tms-core/src/main/resources/mappers/*.xml`, 설정 `mybatis/mybatis-config.xml`, 스캔 `tms-core/.../config/MybatisConfig.java:7`. 제이피에이 어노테이션·리포지토리 추가 금지.
-- 의존 방향 고정: `tms-admin`은 `:tms-core`만, `tms-api`는 `:tms-core`·`:lib-redis`·`:lib-mqtt` 참조. `tms-admin`에 레디스·엠큐티 의존 추가 금지.
+- 의존 방향 고정: `tms-admin`은 `:tms-core`만, `tms-api`는 `:tms-core`·`:lib-redis` 참조. `tms-admin`에 레디스 의존 추가 금지.
 - 계층 순서: `presentation`(컨트롤러·요청·응답) → `service` → `tms-core` 매퍼. 변환기는 맵스트럭트·롬복 애노테이션 프로세서로 생성되므로 객체 변경 후 해당 모듈 리빌드 필요.
 
 ## 수동 검증

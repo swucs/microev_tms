@@ -29,8 +29,8 @@ import com.obigo.microev.tms.core.domain.mapper.vo.dispatch.DispatchDetailResult
 import com.obigo.microev.tms.core.domain.service.UploadService;
 import com.obigo.microev.tms.core.exception.BusinessException;
 import com.obigo.microev.tms.core.exception.InvalidRequestException;
-import com.obigo.microev.tms.lib.publisher.MqttPublisher;
-import com.obigo.microev.tms.lib.vo.MqttDeliveryMessage;
+import com.obigo.microev.tms.api.infrastructure.sse.DeliveryChangedEvent;
+import com.obigo.microev.tms.api.infrastructure.sse.DeliveryEventNotifier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -55,7 +55,7 @@ public class DeliveryServiceImpl implements DeliveryService {
     private final DeliveryHistoryMapper deliveryHistoryMapper;
     private final DeliveryConverter deliveryConverter;
     private final UploadService uploadService;
-    private final MqttPublisher mqttPublisher;
+    private final DeliveryEventNotifier deliveryEventNotifier;
     private final SseHandler sseHandler;
 
     /**
@@ -123,8 +123,8 @@ public class DeliveryServiceImpl implements DeliveryService {
                     //이력생성
                     this.createDevlieryHistory(delivery);
 
-                    //MQTT 이벤트 전송
-                    this.sendMqttDeliveryEvent(delivery);
+                    //배송상태 변경 이벤트 전송(SSE)
+                    this.sendDeliveryEvent(delivery);
                 });
 
 
@@ -232,8 +232,8 @@ public class DeliveryServiceImpl implements DeliveryService {
         //이력생성
         this.createDevlieryHistory(delivery);
 
-        //MQTT 이벤트 전송
-        this.sendMqttDeliveryEvent(delivery);
+        //배송상태 변경 이벤트 전송(SSE)
+        this.sendDeliveryEvent(delivery);
 
         //해당 배차의 모든 배송물량이 완료되었다면 dispatch의 상태도 배송완료로 Update
         Long dispatchSeq = delivery.getDispatchSeq();
@@ -281,8 +281,8 @@ public class DeliveryServiceImpl implements DeliveryService {
         //이력생성
         this.createDevlieryHistory(delivery);
 
-        //MQTT 이벤트 전송
-        this.sendMqttDeliveryEvent(delivery);
+        //배송상태 변경 이벤트 전송(SSE)
+        this.sendDeliveryEvent(delivery);
 
         //해당 배차의 모든 배송물량이 완료되었다면 Dispatch의 상태도 배송완료로 Update
         Long dispatchSeq = delivery.getDispatchSeq();
@@ -345,12 +345,12 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     /**
-     * 배송정보가 변경되었음을 알리는 MQTT 이벤트 전송
+     * 배송정보가 변경되었음을 알리는 SSE 이벤트 전송
      * @param delivery
      */
-    private void sendMqttDeliveryEvent(Delivery delivery) {
-        MqttDeliveryMessage mqttDeliveryMessage = deliveryConverter.toMqttDeliveryMessage(delivery);
-        mqttPublisher.sendChangedDelivery(delivery.getDriverSeq(), mqttDeliveryMessage);
+    private void sendDeliveryEvent(Delivery delivery) {
+        DeliveryChangedEvent event = deliveryConverter.toDeliveryChangedEvent(delivery);
+        deliveryEventNotifier.publish(delivery.getDriverSeq(), event);
     }
 
 

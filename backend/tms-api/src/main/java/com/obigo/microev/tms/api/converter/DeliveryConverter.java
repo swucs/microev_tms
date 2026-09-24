@@ -12,7 +12,7 @@ import com.obigo.microev.tms.core.domain.entity.DeliveryHistory;
 import com.obigo.microev.tms.core.domain.mapper.vo.delivery.DeliveryCountByDriverSeqResult;
 import com.obigo.microev.tms.core.domain.mapper.vo.delivery.DeliveryStatusByDriverSeqResult;
 import com.obigo.microev.tms.core.domain.mapper.vo.delivery.WaybillResult;
-import com.obigo.microev.tms.lib.vo.MqttDeliveryMessage;
+import com.obigo.microev.tms.api.infrastructure.sse.DeliveryChangedEvent;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
@@ -50,5 +50,5 @@ public interface DeliveryConverter {
     void updateDelivery(@MappingTarget Delivery delivery, ProcessUncompletedReqDto processUncompletedReqDto);
 
     @Mapping(target = "eventDatetime", expression = "java(LocalDateTime.now())")
-    MqttDeliveryMessage toMqttDeliveryMessage(Delivery delivery);
+    DeliveryChangedEvent toDeliveryChangedEvent(Delivery delivery);
 }
