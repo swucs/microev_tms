@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- language.xml -->
+<mapper namespace="com.obigo.microev.tms.core.domain.mapper.FileMapper">
+
+    <sql id="file">
+        file_seq,
+        attach_seq,
+        file_full_path,
+        original_file_name,
+        sort_order
+    </sql>
+
+    <insert id="insert" keyProperty="fileSeq">
+        <selectKey order="BEFORE" keyProperty="fileSeq" resultType="long">
+            SELECT NEXTVAL('t_file_file_seq_seq'::regclass)
+        </selectKey>
+
+        INSERT INTO t_file (
+            <include refid="file"/>
+        )
+        VALUES (
+            #{fileSeq},
+            #{attachSeq},
+            #{fileFullPath},
+            #{originalFileName},
+            #{sortOrder}
+        )
+    </insert>
+
+    <select id="findByAttachSeq" resultType="com.obigo.microev.tms.core.domain.entity.File">
+        SELECT
+                <include refid="file"/>
+        FROM    t_file
+        WHERE   attach_seq = #{attachSeq}
+        ORDER BY
+                sort_order
+    </select>
+
+    <select id="findById" resultType="com.obigo.microev.tms.core.domain.entity.File">
+        SELECT
+                <include refid="file"/>
+        FROM    t_file
+        WHERE   file_seq = #{fileSeq}
+    </select>
+</mapper>

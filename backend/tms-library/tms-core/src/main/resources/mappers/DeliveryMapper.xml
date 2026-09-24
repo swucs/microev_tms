@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- language.xml -->
+<mapper namespace="com.obigo.microev.tms.core.domain.mapper.DeliveryMapper">
+    <sql id="columns">
+        delivery_seq,
+        dispatch_seq,
+        vehicle_seq,
+        driver_seq,
+        region_seq,
+        delivery_order,
+        tracking_num,
+        recipient_name,
+        recipient_phone_num,
+        delivery_postal_code,
+        delivery_addr_1,
+        delivery_addr_2,
+        delivery_type_cd,
+        product_name,
+        box_count,
+        memo,
+        security_code,
+        pickup_datetime,
+        latitude,
+        longitude,
+        delivery_status_cd,
+        delivery_estimated_start_time,
+        delivery_estimated_end_time,
+        delivery_datetime,
+        shooting_impossible_yn,
+        shooting_impossible_reason_cd,
+        consignment_location_cd,
+        uncompleted_reason_cd,
+        delivery_photo_attach_seq,
+        created_at,
+        creator_seq,
+        modified_at,
+        modifier_seq
+    </sql>
+    <insert id="insert" parameterType="com.obigo.microev.tms.core.domain.entity.Delivery">
+        <selectKey order="BEFORE" keyProperty="deliverySeq" resultType="long">
+            SELECT
+            NEXTVAL('t_delivery_delivery_seq_seq'::regclass)
+        </selectKey>
+
+        INSERT INTO t_delivery (
+            <include refid="columns"/>
+        )
+        VALUES (
+            #{deliverySeq},
+            #{dispatchSeq},
+            #{vehicleSeq},
+            #{driverSeq},
+            #{regionSeq},
+            #{deliveryOrder},
+            #{trackingNum},
+            #{recipientName},
+            #{recipientPhoneNum},
+            #{deliveryPostalCode},
+            #{deliveryAddr1},
+            #{deliveryAddr2},
+            #{deliveryTypeCd},
+            #{productName},
+            #{boxCount},
+            #{memo},
+            #{securityCode},
+            #{pickupDatetime},
+            #{latitude},
+            #{longitude},
+            #{deliveryStatusCd},
+            #{deliveryEstimatedStartTime},
+            #{deliveryEstimatedEndTime},
+            #{deliveryDatetime},
+            #{shootingImpossibleYn},
+            #{shootingImpossibleReasonCd},
+            #{consignmentLocationCd},
+            #{uncompletedReasonCd},
+            #{deliveryPhotoAttachSeq},
+            #{createdAt},
+            #{creatorSeq},
+            #{modifiedAt},
+            #{modifierSeq}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.obigo.microev.tms.core.domain.entity.Delivery">
+        UPDATE  t_delivery
+        SET
+                dispatch_seq                    = #{dispatchSeq},
+                vehicle_seq                     = #{vehicleSeq},
+                driver_seq                      = #{driverSeq},
+                region_seq                      = #{regionSeq},
+                delivery_order                  = #{deliveryOrder},
+                tracking_num                    = #{trackingNum},
+                recipient_name                  = #{recipientName},
+                recipient_phone_num             = #{recipientPhoneNum},
+                delivery_postal_code            = #{deliveryPostalCode},
+                delivery_addr_1                 = #{deliveryAddr1},
+                delivery_addr_2                 = #{deliveryAddr2},
+                delivery_type_cd                = #{deliveryTypeCd},
+                product_name                    = #{productName},
+                box_count                       = #{boxCount},
+                memo                            = #{memo},
+                security_code                   = #{securityCode},
+                pickup_datetime                 = #{pickupDatetime},
+                latitude                        = #{latitude},
+                longitude                       = #{longitude},
+                delivery_status_cd              = #{deliveryStatusCd},
+                delivery_estimated_start_time   = #{deliveryEstimatedStartTime},
+                delivery_estimated_end_time     = #{deliveryEstimatedEndTime},
+                delivery_datetime               = #{deliveryDatetime},
+                shooting_impossible_yn          = #{shootingImpossibleYn},
+                shooting_impossible_reason_cd   = #{shootingImpossibleReasonCd},
+                consignment_location_cd         = #{consignmentLocationCd},
+                uncompleted_reason_cd           = #{uncompletedReasonCd},
+                delivery_photo_attach_seq       = #{deliveryPhotoAttachSeq},
+                modified_at                     = #{modifiedAt},
+                modifier_seq                    = #{modifierSeq}
+        WHERE   delivery_seq                    = #{deliverySeq}
+    </update>
+
+
+    <update id="updateDeliveryOrder" parameterType="com.obigo.microev.tms.core.domain.entity.Delivery">
+        UPDATE  t_delivery
+        SET
+                delivery_order               = #{deliveryOrder},
+                modified_at                  = #{modifiedAt},
+                modifier_seq                 = #{modifierSeq}
+        WHERE   delivery_seq                 = #{deliverySeq}
+    </update>
+
+    <delete id="delete" parameterType="Long">
+        DELETE
+        FROM    t_delivery
+        WHERE   delivery_seq = #{deliverySeq}
+    </delete>
+
+    <select id="findById" parameterType="Long" resultType="com.obigo.microev.tms.core.domain.entity.Delivery">
+        SELECT
+                <include refid="columns"/>
+        FROM    t_delivery
+        WHERE   delivery_seq = #{deliverySeq}
+    </select>
+
+    <select id="findByDispatchSeqAndDriverSeq" parameterType="Long" resultType="com.obigo.microev.tms.core.domain.entity.Delivery">
+        SELECT
+                <include refid="columns"/>
+        FROM    t_delivery
+        WHERE   dispatch_seq = #{dispatchSeq}
+        <if test="driverSeq != null">
+            AND driver_seq = #{driverSeq}
+        </if>
+    </select>
+
+    <select id="findByDispatchSeq" parameterType="Long" resultType="com.obigo.microev.tms.core.domain.mapper.vo.delivery.DeliveryResult">
+        SELECT
+                a.*
+        FROM
+                (
+                    SELECT
+                            a.delivery_seq,
+                            a.vehicle_seq,
+                            b.vehicle_name,
+                            c.driver_name,
+                            a.region_seq,
+                            d.region_name,
+                            a.delivery_order,
+                            a.tracking_num,
+                            a.recipient_name,
+                            a.recipient_phone_num,
+                            a.delivery_postal_code,
+                            a.delivery_addr_1,
+                            a.delivery_addr_2,
+                            a.delivery_type_cd,
+                            (SELECT com_code_name FROM t_common_code WHERE com_code_group_cd = 'DeliveryType' AND com_code_cd = a.delivery_type_cd) AS delivery_type_cd_name,
+                            a.product_name,
+                            a.box_count,
+                            a.memo,
+                            a.security_code,
+                            a.latitude,
+                            a.longitude,
+                            a.delivery_status_cd,
+                            (SELECT com_code_name FROM t_common_code WHERE com_code_group_cd = 'DeliveryStatus' AND com_code_cd = a.delivery_status_cd) AS delivery_status_cd_name,
+                            a.pickup_datetime,
+                            a.delivery_estimated_start_time,
+                            a.delivery_estimated_end_time,
+                            a.delivery_datetime,
+                            a.shooting_impossible_yn,
+                            a.shooting_impossible_reason_cd,
+                            (SELECT com_code_name FROM t_common_code WHERE com_code_group_cd = 'ShootingImpossibleReason' AND com_code_cd = a.shooting_impossible_reason_cd) AS shooting_impossible_reason_cd_name,
+                            a.consignment_location_cd,
+                            (SELECT com_code_name FROM t_common_code WHERE com_code_group_cd = 'ConsignmentLocation' AND com_code_cd = a.consignment_location_cd) AS consignment_location_cd_name,
+                            a.uncompleted_reason_cd,
+                            (SELECT com_code_name FROM t_common_code WHERE com_code_group_cd = 'UncompletedReason' AND com_code_cd = a.uncompleted_reason_cd) AS uncompleted_reason_cd_name,
+                            a.delivery_photo_attach_seq,
+                            e.original_file_name AS delivery_photo_file_name,
+                            e.file_full_path AS delivery_photo_full_path,
+                            a.created_at,
+                            ROW_NUMBER() OVER(PARTITION BY a.delivery_seq ORDER BY e.sort_order) AS attach_file_sort_order
+                    FROM    t_delivery  a
+                    LEFT JOIN
+                            t_vehicle   b
+                    ON      a.vehicle_seq = b.vehicle_seq
+                    LEFT JOIN
+                            t_driver    c
+                    ON      a.driver_seq = c.driver_seq
+                    LEFT JOIN
+                            t_region    d
+                    ON      a.region_seq = d.region_seq
+                    LEFT JOIN
+                            t_file      e
+                    ON      a.delivery_photo_attach_seq = e.attach_seq
+                    WHERE   a.dispatch_seq = #{dispatchSeq}
+        ) a
+        WHERE a.attach_file_sort_order = 1
+
+    </select>
+
+
+
+    <select id="findMaxTrackingNum" resultType="String">
+        SELECT
+                MAX(tracking_num)
+        FROM    t_delivery
+        WHERE   tracking_num LIKE #{trackingNum} || '%'
+    </select>
+
+
+    <select id="findTrackingNum" resultType="String">
+        SELECT
+                tracking_num
+        FROM    t_delivery
+        WHERE   tracking_num = #{trackingNum}
+    </select>
+
+    <select id="findMaxDeliveryOrder" resultType="Integer">
+        SELECT
+                MAX(delivery_order)
+        FROM    t_delivery
+        WHERE   dispatch_seq = #{dispatchSeq}
+    </select>
+
+
+    <select id="findDeliveryCountByDriverSeq" resultType="com.obigo.microev.tms.core.domain.mapper.vo.delivery.DeliveryCountByDriverSeqResult">
+        SELECT
+                MIN(dispatch_seq) AS dispatch_seq,
+                SUM(total_count) AS total_count,
+                SUM(delivery_total_count) AS delivery_total_count,
+                SUM(delivery_total_completed_count) AS delivery_total_completed_count,
+                SUM(delivery_completed_count) AS delivery_completed_count,
+                SUM(delivery_uncompleted_count) AS delivery_uncompleted_count,
+                SUM(collection_total_count) AS collection_total_count,
+                SUM(collection_total_completed_count) AS collection_total_completed_count,
+                SUM(collection_completed_count) AS collection_completed_count,
+                SUM(collection_uncompleted_count) AS collection_uncompleted_count
+        FROM    (
+                SELECT
+                        a.dispatch_seq,
+                        a.box_count AS total_count,
+                        CASE WHEN delivery_type_cd = 'DELIVERY' THEN a.box_count ELSE 0 END AS delivery_total_count,
+                        CASE WHEN delivery_type_cd = 'DELIVERY' AND delivery_status_cd IN ('COMPLETED', 'UNCOMPLETED') THEN a.box_count ELSE 0 END AS delivery_total_completed_count,
+                        CASE WHEN delivery_type_cd = 'DELIVERY' AND delivery_status_cd = 'COMPLETED' THEN a.box_count ELSE 0 END AS delivery_completed_count,
+                        CASE WHEN delivery_type_cd = 'DELIVERY' AND delivery_status_cd = 'UNCOMPLETED' THEN a.box_count ELSE 0 END AS delivery_uncompleted_count,
+                        CASE WHEN delivery_type_cd = 'COLLECTION' THEN a.box_count ELSE 0 END AS collection_total_count,
+                        CASE WHEN delivery_type_cd = 'COLLECTION' AND delivery_status_cd IN ('COMPLETED', 'UNCOMPLETED') THEN a.box_count ELSE 0 END AS collection_total_completed_count,
+                        CASE WHEN delivery_type_cd = 'COLLECTION' AND delivery_status_cd = 'COMPLETED' THEN a.box_count ELSE 0 END AS collection_completed_count,
+                        CASE WHEN delivery_type_cd = 'COLLECTION' AND delivery_status_cd = 'UNCOMPLETED' THEN a.box_count ELSE 0 END AS collection_uncompleted_count
+                FROM    t_delivery  a
+                WHERE   a.driver_seq = #{driverSeq}
+                AND     a.dispatch_seq = #{dispatchSeq}
+        ) a
+    </select>
+
+    <select id="findCountProcessingDispatch" resultType="int">
+        SELECT
+                COUNT(1)
+        FROM    t_delivery      a
+        INNER JOIN
+                t_dispatch      b
+        ON      a.dispatch_seq = b.dispatch_seq
+        WHERE   a.vehicle_seq = #{vehicleSeq}
+        AND     b.dispatch_status_cd != 'DELIVERY_COMPLETED'    /*배송완료가 아닌 배차데이터 조회*/
+    </select>
+
+
+
+    <select id="findDeliveryStatusByDriverSeq" resultType="com.obigo.microev.tms.core.domain.mapper.vo.delivery.DeliveryStatusByDriverSeqResult">
+        SELECT
+                delivery_addr_1,
+                total_box_count,
+                completed_box_count,
+                delivery_box_count,
+                collection_box_count,
+                delivery_estimated_start_time,
+                delivery_estimated_end_time,
+                latitude,
+                longitude,
+                CASE WHEN total_box_count = completed_box_count THEN 'Y' ELSE 'N' END AS delivery_completed_yn,
+                CASE WHEN total_box_count = completed_box_count THEN delivery_datetime ELSE NULL END AS delivery_datetime
+        FROM    (
+                    SELECT
+                            a.delivery_addr_1,
+                            SUM(a.box_count) AS total_box_count,
+                            SUM(CASE WHEN a.delivery_status_cd IN ('COMPLETED', 'UNCOMPLETED') THEN a.box_count ELSE 0 END) AS completed_box_count,
+                            SUM(CASE WHEN a.delivery_type_cd = 'DELIVERY' THEN a.box_count ELSE 0 END) AS delivery_box_count,
+                            SUM(CASE WHEN a.delivery_type_cd = 'COLLECTION' THEN a.box_count ELSE 0 END) AS collection_box_count,
+                            MAX(a.delivery_estimated_start_time) AS delivery_estimated_start_time,
+                            MAX(a.delivery_estimated_end_time) AS delivery_estimated_end_time,
+                            MIN(a.latitude) AS latitude,
+                            MIN(a.longitude) AS longitude,
+                            MIN(a.delivery_order) AS delivery_order,
+                            MAX(a.delivery_datetime) AS delivery_datetime
+                    FROM    t_delivery  a
+                    WHERE   a.driver_seq = #{driverSeq}
+                    AND     a.dispatch_seq = #{dispatchSeq}
+                    <if test="deliveryAddr1 != null">
+                        AND     a.delivery_addr_1 = #{deliveryAddr1}
+                    </if>
+                    GROUP BY
+                            a.delivery_addr_1
+                ) a
+        ORDER BY
+                delivery_order
+    </select>
+    
+    <select id="findWaybills" resultType="com.obigo.microev.tms.core.domain.mapper.vo.delivery.WaybillResult">
+        SELECT
+                a.delivery_seq,
+                a.tracking_num,
+                a.product_name,
+                a.box_count,
+                a.memo,
+                a.security_code,
+                a.delivery_addr_1,
+                a.delivery_addr_2,
+                a.delivery_status_cd,
+                (SELECT com_code_name FROM t_common_code WHERE com_code_group_cd = 'DeliveryStatus' AND com_code_cd = a.delivery_status_cd) AS delivery_status_cd_name,
+                a.delivery_type_cd,
+                (SELECT com_code_name FROM t_common_code WHERE com_code_group_cd = 'DeliveryType' AND com_code_cd = a.delivery_type_cd) AS delivery_type_cd_name,
+                CASE
+                    WHEN a.delivery_type_cd = 'DELIVERY' THEN
+                        CASE
+                            WHEN a.delivery_status_cd = 'COMPLETED' THEN '배송완료'
+                            WHEN a.delivery_status_cd = 'UNCOMPLETED' THEN '미배송'
+                            ELSE '배송예정'
+                        END
+                    ELSE
+                        CASE
+                            WHEN a.delivery_status_cd = 'COMPLETED' THEN '수거완료'
+                            WHEN a.delivery_status_cd = 'UNCOMPLETED' THEN '미수거'
+                            ELSE '수거예정'
+                        END
+                END AS waybill_status_name,
+                a.shooting_impossible_yn,
+                a.shooting_impossible_reason_cd,
+                (SELECT com_code_name FROM t_common_code WHERE com_code_group_cd = 'ShootingImpossibleReason' AND com_code_cd = a.shooting_impossible_reason_cd) AS shooting_impossible_reason_cd_name,
+                a.consignment_location_cd,
+                (SELECT com_code_name FROM t_common_code WHERE com_code_group_cd = 'ConsignmentLocation' AND com_code_cd = a.consignment_location_cd) AS consignment_location_cd_name,
+                a.uncompleted_reason_cd,
+                (SELECT com_code_name FROM t_common_code WHERE com_code_group_cd = 'UncompletedReason' AND com_code_cd = a.uncompleted_reason_cd) AS uncompleted_reason_cd_name,
+                a.delivery_photo_attach_seq,
+                (
+                    SELECT
+                            file_full_path
+                    FROM    t_attach    x
+                    INNER JOIN
+                            t_file      y
+                    ON      x.attach_seq = y.attach_seq
+                    WHERE   x.attach_seq    = a.delivery_photo_attach_seq
+                    LIMIT   1
+                ) AS delivery_photo_full_path
+        FROM    t_delivery  a
+        WHERE   a.driver_seq = #{driverSeq}
+        AND     a.dispatch_seq = #{dispatchSeq}
+        <if test="deliveryAddr1 != null">
+            AND	a.delivery_addr_1 = #{deliveryAddr1}
+        </if>
+        ORDER BY
+                a.delivery_order
+    </select>
+
+    <sql id="sqlDailyStatistics">
+        SELECT
+            a.delivery_date,
+            a.total_count,
+            a.completed_count,
+            a.delivery_completed_count,
+            a.delivery_uncompleted_count,
+            a.collection_completed_count,
+            a.collection_uncompleted_count,
+            CASE WHEN a.total_count = 0 THEN 0 ELSE TRUNC((a.completed_count / a.total_count) * 100, 2) END AS process_ratio,
+            CASE WHEN a.work_start_datetime IS NULL OR a.work_end_datetime IS NULL
+                 THEN 0
+                 ELSE TRUNC(EXTRACT(EPOCH FROM a.work_end_datetime - a.work_start_datetime) / 60)
+            END AS work_minutes
+        FROM	(
+                    SELECT
+                             b.delivery_date,
+                             SUM(a.box_count) AS total_count,
+                             SUM(CASE WHEN a.delivery_status_cd = 'COMPLETED' THEN a.box_count ELSE 0 END) AS completed_count,
+                             SUM(CASE WHEN a.delivery_type_cd = 'DELIVERY' AND a.delivery_status_cd = 'COMPLETED' THEN a.box_count ELSE 0 END) AS delivery_completed_count,
+                             SUM(CASE WHEN a.delivery_type_cd = 'DELIVERY' AND a.delivery_status_cd != 'COMPLETED' THEN a.box_count ELSE 0 END) AS delivery_uncompleted_count,
+                             SUM(CASE WHEN a.delivery_type_cd = 'COLLECTION' AND a.delivery_status_cd = 'COMPLETED' THEN a.box_count ELSE 0 END) AS collection_completed_count,
+                             SUM(CASE WHEN a.delivery_type_cd = 'COLLECTION' AND a.delivery_status_cd != 'COMPLETED' THEN a.box_count ELSE 0 END) AS collection_uncompleted_count,
+                             MIN((
+                                 SELECT	x.created_at
+                                 FROM	t_delivery_history	x
+                                 WHERE	x.delivery_seq = x.delivery_seq
+                                 AND	x.delivery_status_cd = 'INSPECTION_COMPLETED'	/*검수완료*/
+                                 ORDER BY
+                                        x.created_at ASC
+                                 LIMIT 1
+                             )) AS work_start_datetime,
+                             MAX((
+                                 SELECT	x.created_at
+                                 FROM	t_delivery_history	x
+                                 WHERE	x.delivery_seq = x.delivery_seq
+                                 AND	x.delivery_status_cd = 'COMPLETED'	/*배송완료*/
+                                 ORDER BY
+                                        x.created_at DESC
+                                 LIMIT 1
+                             )) AS work_end_datetime
+                    FROM    t_delivery  a
+                    INNER JOIN
+                            t_dispatch 	b	ON a.dispatch_seq = b.dispatch_seq
+                    WHERE   a.driver_seq = #{driverSeq}
+                    AND		b.delivery_date BETWEEN #{deliveryStartDate} AND #{deliveryEndDate}
+                    GROUP BY
+                            b.delivery_date
+                ) a
+    </sql>
+
+    <select id="findDailyStatistics" resultType="com.obigo.microev.tms.core.domain.mapper.vo.delivery.DeliveryStatisticsByDayResult">
+        <include refid="sqlDailyStatistics"/>
+    </select>
+
+    <select id="findStatisticsSummary" resultType="com.obigo.microev.tms.core.domain.mapper.vo.delivery.DeliveryStatisticsSummaryResult">
+        SELECT
+                SUM(a.total_count) AS total_count,
+                SUM(a.delivery_completed_count) AS delivery_completed_count,
+                SUM(a.delivery_uncompleted_count) AS delivery_uncompleted_count,
+                SUM(a.collection_completed_count) AS collection_completed_count,
+                SUM(a.collection_uncompleted_count) AS collection_uncompleted_count,
+                CASE WHEN SUM(a.total_count) = 0 THEN 0 ELSE TRUNC((SUM(a.completed_count) / SUM(a.total_count)) * 100, 2) END AS process_ratio,
+                SUM(a.work_minutes) AS work_minutes
+        FROM (
+                <include refid="sqlDailyStatistics"/>
+        ) a
+    </select>
+
+
+    <select id="findDriverDeliveryStatus" resultType="String">
+        SELECT
+            CASE
+                WHEN a.inspection_waiting_count > 0 THEN 'INSPECTION_WAITING'
+                WHEN a.inspection_completed_count > 0 THEN 'INSPECTION_COMPLETED'
+                WHEN a.in_delivery_count > 0 THEN 'IN_DELIVERY'
+                ELSE 'COMPLETED'
+            END driver_delivery_status
+        FROM (
+                SELECT
+                        SUM(CASE a.delivery_status_cd WHEN 'INSPECTION_WAITING' THEN 1 ELSE 0 END) AS inspection_waiting_count,
+                        SUM(CASE a.delivery_status_cd WHEN 'INSPECTION_COMPLETED' THEN 1 ELSE 0 END) AS inspection_completed_count,
+                        SUM(CASE a.delivery_status_cd WHEN 'IN_DELIVERY' THEN 1 ELSE 0 END) AS in_delivery_count,
+                        SUM(CASE a.delivery_status_cd WHEN 'COMPLETED' THEN 1 ELSE 0 END) AS completed_count,
+                        SUM(CASE a.delivery_status_cd WHEN 'UNCOMPLETED' THEN 1 ELSE 0 END) AS uncompleted_count
+                FROM    t_delivery  a
+                WHERE   a.driver_seq = #{driverSeq}
+                AND     a.dispatch_seq = #{dispatchSeq}
+        ) a
+    </select>
+
+
+    <delete id="deleteByDispatchSeq" parameterType="Long">
+        DELETE
+        FROM    t_delivery
+        WHERE   dispatch_seq = #{dispatchSeq}
+    </delete>
+
+</mapper>

@@ -1,0 +1,82 @@
+### 로그인 : Admin
+POST {{admin}}/login
+Content-Type: application/json
+
+{
+  "email": "admin@obigo.com",
+  "password": "1234"
+}
+> {%
+    client.global.set("access-token", response.body.data.accessToken);
+    client.global.set("refresh-token", response.body.data.refreshToken);
+%}
+
+
+### 차량 목록조회
+GET {{admin}}/vehicle?vehicleName=&centerName=&vehicleTypeCd=
+Authorization: Bearer {{access-token}}
+
+
+### 차량 등록
+POST {{admin}}/vehicle
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+{
+  "centerSeq": 2,
+  "regionSeq": null,
+  "driverSeq": null,
+  "vehicleName": "테스트-다나고",
+  "model": "다나고",
+  "vehicleTypeCd": "CARGO",
+  "vehicleNum": "123가1313",
+  "vehicleRegNum": "CA052AD04",
+  "modelYear": "2000",
+  "vehicleRegArea": "서울",
+  "ownerName": "홍길동",
+  "length": "5100",
+  "width": "1800",
+  "tonGrade": "10 Ton",
+  "maxLoadingCapacity": "1500Kg",
+  "fuelTypeCd": "DIESEL",
+  "fuelEfficiency": "10.5Km/ℓ",
+  "vehicleUseTypeCd": "RENTED",
+  "garageName": "차고지명",
+  "usageYn": "Y"
+}
+
+
+
+### 차량 수정
+PUT {{admin}}/vehicle/6
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+{
+  "centerSeq": 2,
+  "regionSeq": 2,
+  "driverSeq": null,
+  "vehicleName": "테스트-다나고2",
+  "model": "다나고3",
+  "vehicleTypeCd": "CARGO",
+  "vehicleNum": "123가1313",
+  "vehicleRegNum": "CA052AD04",
+  "modelYear": "2001",
+  "vehicleRegArea": "경기",
+  "ownerName": "홍길동1",
+  "length": "5100",
+  "width": "1800",
+  "tonGrade": "11 Ton",
+  "maxLoadingCapacity": "1500Kg",
+  "fuelTypeCd": "DIESEL",
+  "fuelEfficiency": "10.5Km/ℓ",
+  "vehicleUseTypeCd": "RENTED",
+  "garageName": "차고지명",
+  "usageYn": "Y"
+}
+
+
+### 차량 삭제
+DELETE {{admin}}/vehicle/2
+Content-Type: application/json
+Authorization: Bearer {{access-token}}

@@ -1,0 +1,31 @@
+### 로그인 : API
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{
+  "loginId": "driver03",
+  "password": "1234"
+}
+> {%
+    client.global.set("access-token", response.body.data.accessToken);
+    client.global.set("refresh-token", response.body.data.refreshToken);
+%}
+
+
+### 검수 목록
+GET {{api}}/inspection/mobile
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+
+### 검수 완료 처리
+PUT {{api}}/inspection/mobile/8/completed
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+### 검수 취소 처리
+PUT {{api}}/inspection/mobile/4/cancel
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+

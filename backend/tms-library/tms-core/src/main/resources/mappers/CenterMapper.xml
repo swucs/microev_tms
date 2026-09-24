@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- language.xml -->
+<mapper namespace="com.obigo.microev.tms.core.domain.mapper.CenterMapper">
+    <sql id="columns">
+        center_seq,
+        center_name,
+        center_type_cd,
+        center_addr_1,
+        center_addr_2,
+        zip_code,
+        latitude,
+        longitude,
+        total_area,
+        contact_num,
+        manager_name,
+        usage_yn,
+        created_at,
+        creator_seq,
+        modified_at,
+        modifier_seq
+    </sql>
+
+
+    <insert id="insert" parameterType="com.obigo.microev.tms.core.domain.entity.Center">
+        <selectKey order="BEFORE" keyProperty="centerSeq" resultType="long">
+            SELECT
+            NEXTVAL('t_center_center_seq_seq'::regclass)
+        </selectKey>
+
+        INSERT INTO t_center (
+            <include refid="columns"/>
+        )
+        VALUES (
+            #{centerSeq},
+            #{centerName},
+            #{centerTypeCd},
+            #{centerAddr1},
+            #{centerAddr2},
+            #{zipCode},
+            #{latitude},
+            #{longitude},
+            #{totalArea},
+            #{contactNum},
+            #{managerName},
+            #{usageYn},
+            #{createdAt},
+            #{creatorSeq},
+            #{modifiedAt},
+            #{modifierSeq}
+        )
+    </insert>
+
+
+
+    <update id="update" parameterType="com.obigo.microev.tms.core.domain.entity.Center">
+        UPDATE  t_center
+        SET
+                center_name = #{centerName},
+                center_type_cd = #{centerTypeCd},
+                center_addr_1 = #{centerAddr1},
+                center_addr_2 = #{centerAddr2},
+                zip_code = #{zipCode},
+                latitude = #{latitude},
+                longitude = #{longitude},
+                total_area = #{totalArea},
+                contact_num = #{contactNum},
+                manager_name = #{managerName},
+                usage_yn = #{usageYn},
+                modified_at = #{modifiedAt},
+                modifier_seq = #{modifierSeq}
+        WHERE   center_seq = #{centerSeq}
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE
+        FROM    t_center
+        WHERE   center_seq = #{centerSeq}
+    </delete>
+
+
+    <select id="findById" parameterType="long" resultType="com.obigo.microev.tms.core.domain.entity.Center">
+        SELECT
+                <include refid="columns"/>
+        FROM    t_center
+        WHERE   center_seq = #{centerSeq}
+    </select>
+
+    <select id="findDetailById" parameterType="long"
+                resultType="com.obigo.microev.tms.core.domain.mapper.vo.center.CenterDetailResult">
+        SELECT
+                a.center_seq,
+                a.center_name,
+                a.center_type_cd,
+                (SELECT com_code_name FROM t_common_code WHERE com_code_group_cd = 'CenterType' AND com_code_cd = a.center_type_cd) AS center_type_cd_name,
+                a.center_addr_1,
+                a.center_addr_2,
+                a.zip_code,
+                a.latitude,
+                a.longitude,
+                a.total_area,
+                a.contact_num,
+                a.manager_name,
+                a.usage_yn,
+                a.created_at,
+                a.creator_seq,
+                b.admin_name as creator_name,
+                (SELECT COUNT(1) FROM t_vehicle x WHERE x.center_seq = a.center_seq) as vehicle_count
+        FROM    t_center    a
+        LEFT JOIN
+                t_admin     b
+        ON      a.creator_seq = b.admin_seq
+        WHERE   a.center_seq = #{centerSeq}
+    </select>
+
+    <select id="findByConditions" parameterType="com.obigo.microev.tms.core.domain.mapper.vo.center.SearchCentersCondition"
+            resultType="com.obigo.microev.tms.core.domain.mapper.vo.center.SearchCentersResult">
+
+        SELECT
+            a.center_seq,
+            a.center_name,
+            a.center_type_cd,
+            (SELECT com_code_name FROM t_common_code WHERE com_code_group_cd = 'CenterType' AND com_code_cd = a.center_type_cd) AS center_type_cd_name,
+            a.center_addr_1,
+            a.center_addr_2,
+            a.zip_code,
+            a.total_area,
+            a.contact_num,
+            a.manager_name,
+            a.usage_yn,
+            (SELECT COUNT(1) FROM t_vehicle x WHERE x.center_seq = a.center_seq) as vehicle_count
+        FROM    t_center    a
+        <where>
+            <if test="centerName != null and centerName != ''">
+                AND a.center_name LIKE '%' || #{centerName} || '%'
+            </if>
+            <if test="centerTypeCd != null and centerTypeCd != ''">
+                AND a.center_type_cd = #{centerTypeCd}
+            </if>
+            <if test="managerName != null and managerName != ''">
+                AND a.manager_name LIKE '%' || #{managerName} || '%'
+            </if>
+        </where>
+
+    </select>
+
+
+</mapper>

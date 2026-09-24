@@ -1,0 +1,171 @@
+### 로그인 : Admin
+POST {{admin}}/login
+Content-Type: application/json
+
+{
+  "email": "admin@obigo.com",
+  "password": "1234"
+}
+> {%
+    client.global.set("access-token", response.body.data.accessToken);
+    client.global.set("refresh-token", response.body.data.refreshToken);
+%}
+
+
+### 배차 목록조회
+GET {{admin}}/dispatch?centerName=&dispatchStatusCd=
+Authorization: Bearer {{access-token}}
+
+
+### 배차 등록
+POST {{admin}}/dispatch
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+{
+  "centerSeq": 1,
+  "dispatchName" : "롯데슈퍼 20241008 배차",
+  "deliveryDate" : "2024-08-23"
+}
+
+
+### 배차 상세조회
+GET {{admin}}/dispatch/5
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+
+### 배차 수정
+PUT {{admin}}/dispatch/4
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+{
+  "dispatchName" : "롯데슈퍼 20240823 배차1",
+  "deliveryDate" : "2024-08-24"
+}
+
+### 배차 삭제
+DELETE {{admin}}/dispatch/6
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+
+### 자동 차량배정
+POST {{admin}}/dispatch/autoDispatch
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+{
+  "centerSeq": 1,
+  "roadAddress": "경기 성남시 분당구 판교로 338"
+}
+
+
+### 배송정보 등록
+POST {{admin}}/dispatch/delivery
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+{
+  "dispatchSeq": 5,
+  "regionSeq": 1,
+  "trackingNum": "TMS20241008-0000009",
+  "recipientName": "김선경",
+  "recipientPhoneNum": "010-1234-5678",
+  "deliveryPostalCode": "12345",
+  "deliveryAddr1": "경기 성남시 분당구 판교로 344",
+  "deliveryAddr2": "3층",
+  "productName": "온풍기",
+  "latitude": 37.4025148086863,
+  "longitude": 127.112212646484,
+  "boxCount": 1,
+  "memo": "문 앞에 놓아주세요",
+  "securityCode": "공용: 1234",
+  "deliveryTypeCd": "DELIVERY",
+  "deliveryEstimatedStartTime": "12:00",
+  "deliveryEstimatedEndTime": "14:00",
+  "vehicleSeq": 3,
+  "pickupDatetime": "2025-01-01 10:00"
+}
+
+
+### 배송정보 수정
+PUT {{admin}}/dispatch/delivery/11
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+{
+  "regionSeq": 1,
+  "trackingNum": "TMS20241008-0000009",
+  "recipientName": "김선경1",
+  "recipientPhoneNum": "010-1234-5678",
+  "deliveryPostalCode": "54321",
+  "deliveryAddr1": "경기도 성남시 분당구 판교원로 81번길 15",
+  "deliveryAddr2": "1003동 201호",
+  "productName": "햇반 24개외 상품 2개 11",
+  "latitude": 77.5665,
+  "longitude": 999.9780,
+  "boxCount": 3,
+  "memo": "벨 누르지 말고 전화주세요",
+  "securityCode": "공용: 1234",
+  "deliveryTypeCd": "DELIVERY",
+  "deliveryEstimatedStartTime": "13:00",
+  "deliveryEstimatedEndTime": "15:00",
+  "vehicleSeq": 3,
+  "pickupDatetime": "2025-01-04 10:00"
+}
+
+
+### 배송정보 삭제
+DELETE {{admin}}/dispatch/delivery/3
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+
+### 배차 확정
+PUT {{admin}}/dispatch/5/dispatched
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+
+{
+  "deliveryOrders": [
+    {
+      "vehicleSeq": 3,
+      "deliverySeqList": [10, 9]
+    }
+  ]
+}
+
+
+### 배차 대기 상태로 변경
+PUT {{admin}}/dispatch/4/waiting
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+
+
+### 샘플 엑셀 다운로드
+GET {{admin}}/dispatch/delivery/excel/download-sample-delivery/5
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+
+
+### 배송정보 엑셀 업로드
+POST {{admin}}/dispatch/delivery/excel/upload/5
+Authorization: Bearer {{access-token}}
+Content-Type: multipart/form-data; boundary=boudary
+
+--boudary
+Content-Disposition: form-data; name="file"; filename="test.xlsx"
+
+< d:/test.xlsx
+--boudary--
+
+
+### 배송정보 엑셀 다운로드
+GET {{admin}}/dispatch/delivery/excel/download/5
+Content-Type: application/json
+Authorization: Bearer {{access-token}}

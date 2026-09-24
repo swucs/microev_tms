@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- language.xml -->
+<mapper namespace="com.obigo.microev.tms.core.domain.mapper.RegionMapper">
+    <sql id="columns">
+        region_seq,
+        region_name,
+        created_at,
+        creator_seq,
+        modified_at,
+        modifier_seq
+    </sql>
+
+    <sql id="columnsRegionRange">
+        region_seq,
+        eup_myeon_dong
+    </sql>
+
+    <insert id="insert" parameterType="com.obigo.microev.tms.core.domain.entity.Region">
+        <selectKey order="BEFORE" keyProperty="regionSeq" resultType="long">
+            SELECT
+            NEXTVAL('t_region_region_seq_seq'::regclass)
+        </selectKey>
+
+        INSERT INTO t_region (
+            <include refid="columns"/>
+        )
+        VALUES (
+            #{regionSeq},
+            #{regionName},
+            #{createdAt},
+            #{creatorSeq},
+            #{modifiedAt},
+            #{modifierSeq}
+        )
+    </insert>
+
+
+    <insert id="insertRegionRange" parameterType="com.obigo.microev.tms.core.domain.entity.RegionRange">
+        INSERT INTO t_region_range (
+            <include refid="columnsRegionRange"/>
+        )
+        VALUES (
+            #{regionSeq},
+            #{eupMyeonDong}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.obigo.microev.tms.core.domain.entity.Region">
+        UPDATE  t_region
+        SET
+                region_name = #{regionName},
+                modified_at = #{modifiedAt},
+                modifier_seq = #{modifierSeq}
+        WHERE   region_seq = #{regionSeq}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE
+        FROM    t_region
+        WHERE   region_seq = #{regionSeq}
+    </delete>
+
+
+    <delete id="deleteRegionRangeByRegionId" parameterType="long">
+        DELETE
+        FROM    t_region_range
+        WHERE   region_seq = #{regionSeq}
+    </delete>
+
+    <select id="findById" parameterType="long" resultType="com.obigo.microev.tms.core.domain.entity.Region">
+        SELECT
+                <include refid="columns"/>
+        FROM    t_region
+        WHERE   region_seq = #{regionSeq}
+    </select>
+
+    <select id="findRegionRangeById" parameterType="com.obigo.microev.tms.core.domain.entity.RegionRange"
+            resultType="com.obigo.microev.tms.core.domain.entity.RegionRange">
+        SELECT
+                <include refid="columnsRegionRange"/>
+        FROM    t_region_range
+        WHERE   region_seq = #{regionSeq}
+        AND     eup_myeon_dong = #{eupMyeonDong}
+    </select>
+
+    <select id="findRegionRangesByRegionSeq" parameterType="long"
+            resultType="com.obigo.microev.tms.core.domain.entity.RegionRange">
+        SELECT
+        <include refid="columnsRegionRange"/>
+        FROM    t_region_range
+        WHERE   region_seq = #{regionSeq}
+    </select>
+    
+    <select id="findByConditions" parameterType="com.obigo.microev.tms.core.domain.mapper.vo.region.SearchRegionsCondition"
+            resultType="com.obigo.microev.tms.core.domain.mapper.vo.region.RegionsFindByConditionsResult">
+        SELECT
+                a.region_seq,
+                a.region_name,
+                CASE WHEN a.eup_myeon_dong_cnt = 0 THEN '-'
+                     WHEN a.eup_myeon_dong_cnt = 1 THEN a.eup_myeon_dong
+                     ELSE a.eup_myeon_dong || ' 외 ' || eup_myeon_dong_cnt - 1 || '개'
+                END AS eup_myeon_dong,
+                CASE WHEN a.vehicle_cnt = 0 THEN '-'
+                     WHEN a.vehicle_cnt = 1 THEN a.vehicle_name
+                     ELSE a.vehicle_name || ' 외 ' || vehicle_cnt - 1 || '대'
+                END AS vehicle_name,
+                a.creator_name,
+                a.created_at
+        FROM (
+                SELECT
+                        a.region_seq,
+                        a.region_name,
+                        (SELECT eup_myeon_dong FROM t_region_range x WHERE x.region_seq = a.region_seq LIMIT 1) AS eup_myeon_dong,
+                        (SELECT COUNT(1) FROM t_region_range x WHERE x.region_seq = a.region_seq) AS eup_myeon_dong_cnt,
+                        (SELECT vehicle_name FROM t_vehicle x WHERE x.region_seq = a.region_seq LIMIT 1) AS vehicle_name,
+                        (SELECT COUNT(1) FROM t_vehicle x WHERE x.region_seq = a.region_seq) AS vehicle_cnt,
+                        a.creator_seq,
+                        b.admin_name AS creator_name,
+                        a.created_at
+                FROM    t_region    a
+                LEFT JOIN
+                        t_admin     b
+                ON      a.creator_seq = b.admin_seq
+                <where>
+                        <if test="regionName != null and regionName != ''">
+                            AND region_name LIKE #{regionName} || '%'
+                        </if>
+                        <if test="vehicleName != null and vehicleName != ''">
+                            AND EXISTS (SELECT  1
+                                        FROM    t_vehicle x
+                                        WHERE   x.region_seq = a.region_seq
+                                        AND     vehicle_name LIKE #{vehicleName} || '%'
+                            )
+                        </if>
+                        <if test="eupMyeonDong != null and eupMyeonDong != ''">
+                            AND EXISTS (SELECT  1
+                                        FROM    t_region_range x
+                                        WHERE   x.region_seq = a.region_seq
+                                        AND     eup_myeon_dong LIKE '%' || #{eupMyeonDong} || '%'
+                            )
+                        </if>
+                </where>
+        ) a
+    </select>
+
+
+</mapper>

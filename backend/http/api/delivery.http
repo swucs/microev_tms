@@ -1,0 +1,83 @@
+### 로그인 : API
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{
+  "loginId": "driver03",
+  "password": "1234"
+}
+> {%
+    client.global.set("access-token", response.body.data.accessToken);
+    client.global.set("refresh-token", response.body.data.refreshToken);
+%}
+
+### SSE 구독
+GET {{api}}/delivery/subscribe
+Authorization: Bearer {{access-token}}
+Accept: text/event-stream
+Cache-Control: no-cache
+
+### 메인화면 정보
+GET {{api}}/delivery/main
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+
+### 배송현황 정보
+GET {{api}}/delivery/status
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+
+### 운송장리스트 조회
+GET {{api}}/delivery/waybill?address=경기도 성남시 분당구 판교원로 81번길 15
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+### 배송완료 처리 (파일업로드 있음)
+PUT {{api}}/delivery/mobile/5/completed
+Authorization: Bearer {{access-token}}
+Content-Type: multipart/form-data; boundary=boudary
+
+--boudary
+Content-Disposition: form-data; name="deliveryCompleted"; filename="deliveryCompleted.json
+Content-Type: application/json
+
+{
+  "shootingImpossibleYn": "N",
+  "shootingImpossibleReasonCd": null,
+  "consignmentLocationCd": "FRONT_OF_DOOR"
+}
+--boudary
+Content-Disposition: form-data; name="attachFile"; filename="test01.png"
+
+< d:/test/attach/game1/Pv_01.png
+--boudary--
+
+
+### 배송완료 처리 (파일업로드 없음)
+PUT {{api}}/delivery/mobile/5/completed
+Authorization: Bearer {{access-token}}
+Content-Type: multipart/form-data; boundary=boudary
+
+--boudary
+Content-Disposition: form-data; name="deliveryCompleted"; filename="deliveryCompleted.json
+Content-Type: application/json
+
+{
+  "shootingImpossibleYn": "Y",
+  "shootingImpossibleReasonCd": null,
+  "consignmentLocationCd": "FRONT_OF_DOOR"
+}
+--boudary
+
+
+### 미배송/미수거 처리
+PUT {{api}}/delivery/mobile/4/uncompleted
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+{
+  "uncompletedReasonCd": "LOST_PARCEL"
+}
+

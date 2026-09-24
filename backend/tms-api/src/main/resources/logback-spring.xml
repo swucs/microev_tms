@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <property name="LOG_FILE_PATH" value="/mnt/data/logs/tms-api/applog/"/>
+    <property name="LOG_FILE_NAME" value="TmsApi"/>
+    <property name="FILE_LOG_PATTERN"
+              value="%cyan(%d{yyyy-MM-dd HH:mm:ss.SSS}) %green([%thread]) %highlight(%-5level) %magenta(%logger{36} %method:%line) - %yellow(%msg%n)"/>
+
+    <appender name="CONSOLE_POLICY" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </layout>
+    </appender>
+
+    <appender name="FILE_POLICY" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE_PATH}${LOG_FILE_NAME}</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE_PATH}${LOG_FILE_NAME}.%d{yyyyMMdd}.%i.log</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+
+    <!-- profile obigo -->
+    <springProfile name="local">
+        <logger name="root" level="info"/>
+        <logger name="org.springframework" level="info"/>
+        <logger name="com.obigo.microev.tms" level="debug"/>
+        <logger name="org.hibernate.SQL" level="debug"/>
+        <logger name="org.mybatis" level="debug"/> <!-- MyBatis SQL 로그 설정 추가 -->
+        <root>
+            <appender-ref ref="CONSOLE_POLICY"/>
+        </root>
+    </springProfile>
+
+
+    <!-- profile dev -->
+    <springProfile name="dev">
+        <logger name="root" level="info"/>
+        <logger name="org.springframework" level="info"/>
+        <logger name="com.obigo.microev.tms" level="debug"/>
+        <logger name="org.hibernate.SQL" level="debug"/>
+        <root>
+            <appender-ref ref="CONSOLE_POLICY"/>
+            <appender-ref ref="FILE_POLICY"/>
+        </root>
+    </springProfile>
+</configuration>

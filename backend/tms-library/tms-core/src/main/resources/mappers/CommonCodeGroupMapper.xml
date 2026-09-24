@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- language.xml -->
+<mapper namespace="com.obigo.microev.tms.core.domain.mapper.CommonCodeGroupMapper">
+
+    <sql id="columnsCommonCodeGroup">
+        com_code_group_cd,
+        com_code_group_name,
+        created_at,
+        creator_seq,
+        modified_at,
+        modifier_seq
+    </sql>
+
+    <select id="searchCommonCodeGroups" parameterType="com.obigo.microev.tms.core.domain.mapper.vo.commonCode.SearchCommonCodeGroupsCondition"
+            resultType="com.obigo.microev.tms.core.domain.mapper.vo.commonCode.SearchCommonCodeGroupsResult">
+        /** CommonCodeGroupMapper.searchCommonCodeGroups */
+        SELECT
+                com_code_group_cd,
+                com_code_group_name
+        FROM
+                t_common_code_group
+        <where>
+            <if test="comCodeGroupCd != null and comCodeGroupCd != ''">
+                AND com_code_group_cd like #{comCodeGroupCd} || '%'
+            </if>
+            <if test="comCodeGroupName != null and comCodeGroupName != ''">
+                AND com_code_group_name like #{comCodeGroupName} || '%'
+            </if>
+        </where>
+        ORDER BY
+                com_code_group_cd ASC
+    </select>
+
+    <select id="findById" parameterType="String" resultType="com.obigo.microev.tms.core.domain.entity.CommonCodeGroup">
+        /** CommonCodeGroupMapper.findById */
+        SELECT
+                <include refid="columnsCommonCodeGroup" />
+        FROM
+                t_common_code_group
+        WHERE
+                com_code_group_cd = #{comCodeGroupCd}
+    </select>
+
+    <insert id="insertCommonCodeGroup" parameterType="com.obigo.microev.tms.core.domain.entity.CommonCodeGroup">
+        /** CommonCodeGroupMapper.insertCommonCodeGroup */
+        insert into t_common_code_group (
+            <include refid="columnsCommonCodeGroup" />
+        )
+        values (
+            #{comCodeGroupCd},
+            #{comCodeGroupName},
+            #{createdAt},
+            #{creatorSeq},
+            #{modifiedAt},
+            #{modifierSeq}
+        )
+
+        <selectKey resultType="String" order="AFTER" keyColumn="com_code_group_cd" keyProperty="comCodeGroupCd">
+            SELECT
+                    com_code_group_cd
+            FROM
+                    t_common_code_group
+            WHERE
+                    com_code_group_cd = #{comCodeGroupCd}
+        </selectKey>
+    </insert>
+
+
+
+    <update id="updateCommonCodeGroup" parameterType="com.obigo.microev.tms.core.domain.entity.CommonCodeGroup">
+        /** CommonCodeGroupMapper.updateCommonCodeGroup */
+        UPDATE  t_common_code_group
+        SET
+                com_code_group_name = #{comCodeGroupName},
+                modified_at = #{modifiedAt},
+                modifier_seq = #{modifierSeq}
+        WHERE
+                com_code_group_cd = #{comCodeGroupCd}
+    </update>
+
+    <delete id="deleteById" parameterType="string">
+        /** CommonCodeGroupMapper.deleteById */
+        DELETE
+        FROM
+                t_common_code_group
+        WHERE
+                com_code_group_cd = #{comCodeGroupCd}
+    </delete>
+
+</mapper>

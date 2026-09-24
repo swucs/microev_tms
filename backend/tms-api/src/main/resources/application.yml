@@ -1,0 +1,16 @@
+server:
+  port: 8091
+  servlet:
+    context-path: /tms/api
+
+spring:
+  profiles:
+    active: local
+  config:
+    import:
+      - classpath:application-core.yml
+      - classpath:application-core-db.yml
+      - classpath:application-core-jwt.yml
+      - classpath:application-core-aws.yml
+      - classpath:application-lib-redis.yml
+      - classpath:application-lib-mqtt.yml

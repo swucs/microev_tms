@@ -1,0 +1,18 @@
+server:
+  tomcat:
+    access-log:
+      enabled: "true"
+      pattern: "%{yyyy-MM-dd HH:mm:ss}t %s %r %q %{User-Agent}i %{Referer}i %a %D"
+      directory: "D:/mnt/data/logs/tms-api/access"
+      prefix: "access-TmsApi"
+      suffix: ".log"
+      file-date-format: ".yyyy-MM-dd"
+      max-days: 90
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: "/api-docs"
+  swagger-ui:
+    enabled: true
+  packages-to-scan: "com.obigo.microev.tms.api.presentation"

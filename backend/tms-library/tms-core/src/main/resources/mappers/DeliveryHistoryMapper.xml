@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- language.xml -->
+<mapper namespace="com.obigo.microev.tms.core.domain.mapper.DeliveryHistoryMapper">
+    <sql id="columns">
+        delivery_history_seq,
+        delivery_seq,
+        dispatch_seq,
+        driver_seq,
+        delivery_status_cd,
+        created_at,
+        creator_seq
+    </sql>
+
+    <insert id="insert" parameterType="com.obigo.microev.tms.core.domain.entity.DeliveryHistory">
+        <selectKey order="BEFORE" keyProperty="deliveryHistorySeq" resultType="long">
+            SELECT
+            NEXTVAL('t_delivery_history_delivery_history_seq_seq'::regclass)
+        </selectKey>
+
+        INSERT INTO t_delivery_history (
+            <include refid="columns"/>
+        )
+        VALUES (
+            #{deliveryHistorySeq},
+            #{deliverySeq},
+            #{dispatchSeq},
+            #{driverSeq},
+            #{deliveryStatusCd},
+            #{createdAt},
+            #{creatorSeq}
+        )
+    </insert>
+</mapper>

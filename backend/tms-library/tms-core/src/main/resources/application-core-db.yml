@@ -1,0 +1,36 @@
+
+mybatis:
+  config-location: classpath:/mybatis/mybatis-config.xml
+  mapper-locations: classpath:mappers/*.xml
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:15432/tms_dev_db?currentSchema=public
+    username: "ENC(S6lmqTznoaL6Ny+uBWyXdA==)"
+    password: "ENC(P1i9G0fBRfeasDAnpEp7Dce71JCBCuRbKbZjhiYBFgfMdrYcgDZ3uZm9Yfj6oo4j)"
+    hikari:
+      pool-name: hikari-pool
+      maximum-pool-size: 10
+      connection-timeout: 1000
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://obigo-db-instance.c7mioicmkv7h.ap-northeast-2.rds.amazonaws.com:5432/tms_db?currentSchema=public
+    username: "ENC(mr1ezjwuwtvf7L0UinwM8w==)"
+    password: "ENC(46D4zyp3kLs9nyAhYZGdLsu15JrVEHa2)"
+    hikari:
+      pool-name: hikari-pool
+      maximum-pool-size: 10
+      connection-timeout: 1000

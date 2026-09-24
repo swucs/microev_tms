@@ -1,0 +1,20 @@
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+jwt:
+  secret: "ENC(u3mSjpr1nJZBz0cuf20ZkiuG0BqHHRmlmgJuupGXgfV9IgZPOuQzUkzlFSrn+EILB4Wst2Gb/wt43ZH3rwxdjrCR4KrRkkLiG5GKP8szX/0=)"
+  token:
+    access-expiration-time: 3600000    # 1시간
+    refresh-expiration-time: 604800000   # 7일
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+jwt:
+  secret: "ENC(dXt7HDQ1AV9xlsPsKdNPm0pu3wML9S60yF8PoG7Y+iQxVvJHscSVCqwwYUnDd5rGNG+iuXsFByOIKfC+/yjKJw==)"
+  token:
+    access-expiration-time: 3600000    # 1시간
+    refresh-expiration-time: 604800000   # 7일

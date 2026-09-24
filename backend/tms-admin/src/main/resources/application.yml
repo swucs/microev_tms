@@ -1,0 +1,38 @@
+server:
+  port: 8090
+  servlet:
+    context-path: /tms/admin
+
+spring:
+  profiles:
+    active: local
+  config:
+    import:
+      - classpath:application-core.yml
+      - classpath:application-core-db.yml
+      - classpath:application-core-jwt.yml
+      - classpath:application-core-aws.yml
+
+
+
+external:
+  kakao-api:
+    domain: "https://dapi.kakao.com"
+    address:
+      url: "/v2/local/search/address.json?analyze_type=similar&page=1&size=10&query="
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+external:
+  kakao-api:
+    key: "ENC(NYOhdVxUIopB5z/+HSpxUIQQr2OV5YMM)"
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+external:
+  kakao-api:
+    key: "ENC(tIcgVsWa+f+TOVlBPfsQZf0w4RS4VGk4bjlin4Bul254BXBlaOFBjno8ZZfJ00G/)"

@@ -1,0 +1,25 @@
+### 로그인 : API
+POST {{api}}/auth/login
+Content-Type: application/json
+Origin: http://localhost:8080
+
+{
+  "loginId": "driver03",
+  "password": "1234"
+}
+> {%
+    client.global.set("access-token", response.body.data.accessToken);
+    client.global.set("refresh-token", response.body.data.refreshToken);
+%}
+
+### 로그아웃 : API
+POST {{api}}/auth/logout
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+
+### 모바일용 토큰
+GET {{api}}/auth/mobile-token
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+

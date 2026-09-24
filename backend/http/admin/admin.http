@@ -1,0 +1,58 @@
+### 로그인 : Admin
+POST {{admin}}/login
+Content-Type: application/json
+Origin: http://localhost:8080
+
+{
+  "email": "admin@obigo.com",
+  "password": "1234"
+}
+> {%
+    client.global.set("access-token", response.body.data.accessToken);
+    client.global.set("refresh-token", response.body.data.refreshToken);
+%}
+
+
+### 관리자 목록조회
+GET {{admin}}/admin?email=&adminName=&statusCd=
+Authorization: Bearer {{access-token}}
+
+
+### 관리자 목록조회 검색
+GET {{admin}}/admin?adminName=&email=
+Authorization: Bearer {{access-token}}
+
+
+### 관리자 등록
+POST {{admin}}/admin
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+{
+  "email": "test.kim@obigo.com",
+  "password": "1234",
+  "adminName": "test Kim",
+  "contact": "010-7408-1234",
+  "position": "수석"
+}
+
+
+
+### 관리자 수정
+PUT {{admin}}/admin/3
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+{
+  "adminName": "판교 롯데마트122",
+  "zipCode": "13525",
+  "adminAddr1": "경기 성남시 분당구 대왕판교로606번길",
+  "adminAddr2": "58",
+  "latitude": "37.3955577",
+  "longitude": "127.1133755",
+  "totalArea": "1000.352",
+  "managerName": "김오비고1",
+  "contactNum": "010-1234-5678",
+  "usageYn": "Y"
+}
+

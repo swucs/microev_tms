@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.obigo.microev.tms.core.domain.mapper.AdminMapper">
+
+    <sql id="columns">
+        admin_seq,
+        email,
+        admin_name,
+        password,
+        contact,
+        position,
+        fail_count,
+        password_changed_at,
+        last_accessed_at,
+        refresh_token,
+        status_cd,
+        created_at,
+        creator_seq,
+        modified_at,
+        modifier_seq
+    </sql>
+
+    <select id="findById" parameterType="Long" resultType="com.obigo.microev.tms.core.domain.entity.Admin">
+        SELECT
+                <include refid="columns"/>
+        FROM    t_admin
+        WHERE   admin_seq = #{adminSeq}
+    </select>
+
+    <select id="findByEmail" parameterType="String" resultType="com.obigo.microev.tms.core.domain.entity.Admin">
+        SELECT
+                <include refid="columns"/>
+        FROM    t_admin
+        WHERE   email = #{email}
+    </select>
+
+
+    <update id="updateAccessInfo" parameterType="com.obigo.microev.tms.core.domain.entity.Admin">
+        UPDATE  t_admin
+        SET     last_accessed_at = #{lastAccessedAt},
+                refresh_token = #{refreshToken},
+                fail_count = #{failCount},
+                status_cd = #{statusCd},
+                modified_at = #{modifiedAt},
+                modifier_seq = #{modifierSeq}
+        WHERE   admin_seq = #{adminSeq}
+    </update>
+
+    <update id="updateRefreshToken" parameterType="com.obigo.microev.tms.core.domain.entity.Admin">
+        UPDATE  t_admin
+        SET     refresh_token = #{refreshToken},
+                modified_at = #{modifiedAt},
+                modifier_seq = #{modifierSeq}
+        WHERE   portal_user_seq = #{portalUserSeq}
+    </update>
+
+
+    <select id="findByConditions" parameterType="com.obigo.microev.tms.core.domain.mapper.vo.admin.SearchAdminsCondition"
+            resultType="com.obigo.microev.tms.core.domain.mapper.vo.admin.SearchAdminsResult">
+
+        SELECT
+                a.admin_seq,
+                a.email,
+                a.admin_name,
+                a.contact,
+                a.position,
+                a.last_accessed_at,
+                a.status_cd,
+                (SELECT com_code_name FROM t_common_code WHERE com_code_group_cd = 'AdminStatus' AND com_code_cd = a.status_cd) AS status_cd_name
+        FROM    t_admin    a
+        <where>
+            <if test="email != null and email != ''">
+                AND a.email LIKE '%' || #{email} || '%'
+            </if>
+            <if test="adminName != null and adminName != ''">
+                AND a.admin_name LIKE '%' || #{adminName} || '%'
+            </if>
+            <if test="statusCd != null and statusCd != ''">
+                AND a.status_cd = #{statusCd}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert" parameterType="com.obigo.microev.tms.core.domain.entity.Admin">
+        <selectKey order="BEFORE" keyProperty="adminSeq" resultType="long">
+            SELECT
+            NEXTVAL('t_admin_admin_seq_seq'::regclass)
+        </selectKey>
+
+        INSERT INTO t_admin (
+            <include refid="columns"/>
+        ) VALUES (
+            #{adminSeq},
+            #{email},
+            #{adminName},
+            #{password},
+            #{contact},
+            #{position},
+            #{failCount},
+            #{passwordChangedAt},
+            #{lastAccessedAt},
+            #{refreshToken},
+            #{statusCd},
+            #{createdAt},
+            #{creatorSeq},
+            #{modifiedAt},
+            #{modifierSeq}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.obigo.microev.tms.core.domain.entity.Admin">
+        UPDATE  t_admin
+        SET
+                admin_name = #{adminName},
+                password = #{password},
+                contact = #{contact},
+                position = #{position},
+                fail_count = #{failCount},
+                password_changed_at = #{passwordChangedAt},
+                last_accessed_at = #{lastAccessedAt},
+                refresh_token = #{refreshToken},
+                status_cd = #{statusCd},
+                modified_at = #{modifiedAt},
+                modifier_seq = #{modifierSeq}
+        WHERE   admin_seq = #{adminSeq}
+    </update>
+
+</mapper>

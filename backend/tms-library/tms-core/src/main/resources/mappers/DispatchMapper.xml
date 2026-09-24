@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- language.xml -->
+<mapper namespace="com.obigo.microev.tms.core.domain.mapper.DispatchMapper">
+    <sql id="columns">
+        dispatch_seq,
+        center_seq,
+        dispatch_name,
+        delivery_date,
+        dispatch_status_cd,
+        created_at,
+        creator_seq,
+        modified_at,
+        modifier_seq
+    </sql>
+
+    <insert id="insert" parameterType="com.obigo.microev.tms.core.domain.entity.Dispatch">
+        <selectKey order="BEFORE" keyProperty="dispatchSeq" resultType="long">
+            SELECT
+            NEXTVAL('t_dispatch_dispatch_seq_seq'::regclass)
+        </selectKey>
+
+        INSERT INTO t_dispatch (
+            <include refid="columns"/>
+        )
+        VALUES (
+            #{dispatchSeq},
+            #{centerSeq},
+            #{dispatchName},
+            #{deliveryDate},
+            #{dispatchStatusCd},
+            #{createdAt},
+            #{creatorSeq},
+            #{modifiedAt},
+            #{modifierSeq}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.obigo.microev.tms.core.domain.entity.Dispatch">
+        UPDATE  t_dispatch
+        SET
+                center_seq           = #{centerSeq},
+                dispatch_name        = #{dispatchName},
+                delivery_date        = #{deliveryDate},
+                dispatch_status_cd   = #{dispatchStatusCd},
+                modified_at          = #{modifiedAt},
+                modifier_seq         = #{modifierSeq}
+        WHERE   dispatch_seq         = #{dispatchSeq}
+    </update>
+
+    <select id="findById" parameterType="Long" resultType="com.obigo.microev.tms.core.domain.entity.Dispatch">
+        SELECT
+                <include refid="columns"/>
+        FROM    t_dispatch
+        WHERE   dispatch_seq = #{dispatchSeq}
+    </select>
+
+    <select id="findDetailById" parameterType="long"
+            resultType="com.obigo.microev.tms.core.domain.mapper.vo.dispatch.DispatchDetailResult">
+        SELECT
+            a.dispatch_seq,
+            a.dispatch_name,
+            a.delivery_date,
+            a.center_seq,
+            b.center_name,
+            a.dispatch_status_cd,
+            (SELECT com_code_name FROM t_common_code WHERE com_code_group_cd = 'DispatchStatus' AND com_code_cd = a.dispatch_status_cd) AS dispatch_status_cd_name
+        FROM    t_dispatch      a
+        LEFT JOIN
+                t_center        b
+        ON      a.center_seq    = b.center_seq
+        WHERE   a.dispatch_seq   = #{dispatchSeq}
+    </select>
+
+    <select id="findByConditions"
+            parameterType="com.obigo.microev.tms.core.domain.mapper.vo.dispatch.SearchDispatchesCondition"
+            resultType="com.obigo.microev.tms.core.domain.mapper.vo.dispatch.SearchDispatchesResult">
+        SELECT
+                a.dispatch_seq,
+                a.dispatch_name,
+                a.delivery_date,
+                a.center_seq,
+                b.center_name,
+                a.dispatch_status_cd,
+                (SELECT com_code_name FROM t_common_code WHERE com_code_group_cd = 'DispatchStatus' AND com_code_cd = a.dispatch_status_cd) AS dispatch_status_cd_name,
+                (SELECT COUNT(1) FROM t_delivery x WHERE x.dispatch_seq = a.dispatch_seq) AS delivery_count,
+                (SELECT COUNT(1) FROM t_vehicle x WHERE x.center_seq = a.center_seq) AS delivery_vehicle_count
+        FROM    t_dispatch      a
+        LEFT JOIN
+                t_center        b
+        ON      a.center_seq    = b.center_seq
+        <where>
+            <if test="centerName != null and centerName != ''">
+                AND b.center_name LIKE '%' || #{centerName} || '%'
+            </if>
+            <if test="dispatchStatusCd != null and dispatchStatusCd != ''">
+                AND a.dispatch_status_cd LIKE '%' || #{centerName} || '%'
+            </if>
+        </where>
+        ORDER BY
+                a.delivery_date DESC, a.dispatch_seq DESC
+
+    </select>
+
+
+    <select id="findByDriverSeq" resultType="com.obigo.microev.tms.core.domain.mapper.vo.dispatch.DispatchDetailResult">
+        SELECT
+                a.dispatch_seq,
+                a.dispatch_name,
+                a.delivery_date,
+                a.center_seq,
+                a.dispatch_status_cd,
+                (SELECT com_code_name FROM t_common_code WHERE com_code_group_cd = 'DispatchStatus' AND com_code_cd = a.dispatch_status_cd) AS dispatch_status_cd_name
+        FROM    t_dispatch      a
+        WHERE   a.delivery_date = #{deliveryDate}
+        AND     EXISTS(
+                SELECT  1
+                FROM    t_vehicle  x
+                WHERE   x.center_seq = a.center_seq
+                AND     x.driver_seq = #{driverSeq}
+        )
+        ORDER BY
+                a.dispatch_seq DESC
+        LIMIT   1
+    </select>
+
+
+    <delete id="delete" parameterType="Long">
+        DELETE
+        FROM    t_dispatch
+        WHERE   dispatch_seq = #{dispatchSeq}
+    </delete>
+</mapper>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- language.xml -->
+<mapper namespace="com.obigo.microev.tms.core.domain.mapper.DriverMapper">
+    <sql id="columns">
+        driver_seq,
+        driver_name,
+        center_seq,
+        login_id,
+        password,
+        ext_system_linked_id,
+        driver_phone_num,
+        email,
+        driver_license_num,
+        driver_license_date,
+        driver_license_agency,
+        comp_name,
+        working_days,
+        working_start_hour,
+        working_end_hour,
+        status_cd,
+        created_at,
+        creator_seq,
+        modified_at,
+        modifier_seq
+    </sql>
+
+    <insert id="insert" parameterType="com.obigo.microev.tms.core.domain.entity.Driver">
+        <selectKey order="BEFORE" keyProperty="driverSeq" resultType="long">
+            SELECT
+            NEXTVAL('t_driver_driver_seq_seq'::regclass)
+        </selectKey>
+
+        INSERT INTO t_driver (
+            <include refid="columns"/>
+        )
+        VALUES (
+            #{driverSeq},
+            #{driverName},
+            #{centerSeq},
+            #{loginId},
+            #{password},
+            #{extSystemLinkedId},
+            #{driverPhoneNum},
+            #{email},
+            #{driverLicenseNum},
+            #{driverLicenseDate},
+            #{driverLicenseAgency},
+            #{compName},
+            #{workingDays},
+            #{workingStartHour},
+            #{workingEndHour},
+            #{statusCd},
+            #{createdAt},
+            #{creatorSeq},
+            #{modifiedAt},
+            #{modifierSeq}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.obigo.microev.tms.core.domain.entity.Driver">
+        UPDATE t_driver
+        SET
+                driver_name = #{driverName},
+                center_seq = #{centerSeq},
+                password = #{password},
+                ext_system_linked_id = #{extSystemLinkedId},
+                driver_phone_num = #{driverPhoneNum},
+                email = #{email},
+                driver_license_num = #{driverLicenseNum},
+                driver_license_date = #{driverLicenseDate},
+                driver_license_agency = #{driverLicenseAgency},
+                comp_name = #{compName},
+                working_days = #{workingDays},
+                working_start_hour = #{workingStartHour},
+                working_end_hour = #{workingEndHour},
+                status_cd = #{statusCd},
+                modified_at = #{modifiedAt},
+                modifier_seq = #{modifierSeq}
+        WHERE   driver_seq = #{driverSeq}
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE
+        FROM    t_driver
+        WHERE   driver_seq = #{driverSeq}
+    </delete>
+
+    <select id="findById" parameterType="long" resultType="com.obigo.microev.tms.core.domain.entity.Driver">
+        SELECT
+                <include refid="columns"/>
+        FROM    t_driver
+        WHERE   driver_seq = #{driverSeq}
+    </select>
+
+    <select id="findByLoginId" parameterType="string" resultType="com.obigo.microev.tms.core.domain.entity.Driver">
+        SELECT
+                <include refid="columns"/>
+        FROM    t_driver
+        WHERE   login_id = #{loginId}
+    </select>
+
+    <select id="findByExtSystemLinkedId" parameterType="string" resultType="com.obigo.microev.tms.core.domain.entity.Driver">
+        SELECT
+        <include refid="columns"/>
+        FROM    t_driver
+        WHERE   ext_system_linked_id = #{extSystemLinkedId}
+    </select>
+    
+    <select id="findByConditions" resultType="com.obigo.microev.tms.core.domain.mapper.vo.driver.SearchDriversResult">
+        SELECT
+                a.driver_seq,
+                a.driver_name,
+                a.center_seq,
+                c.center_name,
+                a.login_id,
+                a.ext_system_linked_id,
+                a.driver_phone_num,
+                a.email,
+                a.driver_license_num,
+                a.driver_license_date,
+                a.driver_license_agency,
+                a.comp_name,
+                a.working_days,
+                a.working_start_hour,
+                a.working_end_hour,
+                a.status_cd,
+                (SELECT com_code_name FROM t_common_code WHERE com_code_group_cd = 'DriverStatus' AND com_code_cd = a.status_cd) AS status_cd_name,
+                a.creator_seq,
+                b.admin_name AS creator_name,
+                a.created_at
+        FROM    t_driver    a
+        LEFT JOIN
+                t_admin     b
+        ON      a.creator_seq = b.admin_seq
+        LEFT JOIN
+                t_center    c
+        ON      a.center_seq = c.center_seq
+        <where>
+            <if test="driverName != null and driverName != ''">
+                AND a.driver_name LIKE '%' || #{driverName} || '%'
+            </if>
+            <if test="centerName != null and centerName != ''">
+                AND c.center_name LIKE '%' || #{centerName} || '%'
+            </if>
+            <if test="statusCd != null and statusCd != ''">
+                AND a.status_cd = #{statusCd}
+            </if>
+        </where>
+    </select>
+</mapper>

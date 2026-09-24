@@ -1,0 +1,18 @@
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  data:
+    redis:
+      host: 10.28.3.236
+      port: 6379
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  data:
+    redis:
+      host: obigo-redis-cluster.iiiskg.ng.0001.apn2.cache.amazonaws.com
+      port: 6379

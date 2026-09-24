@@ -1,0 +1,28 @@
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+aws:
+  s3:
+    bucket: obigo-tms-dev-bucket
+    domain: https://obigo-tms-dev-bucket.s3.ap-northeast-2.amazonaws.com
+  credentials:
+    access-key: ENC(NYOhdVxUIopB5z/+HSpxUIQQr2OV5YMM)
+    secret-key: ENC(NYOhdVxUIopB5z/+HSpxUIQQr2OV5YMM)
+  cloudfront:
+    domain: https://d3go34pzvd3xfw.cloudfront.net
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+aws:
+  s3:
+    bucket: obigo-tms-bucket
+    domain: https://obigo-tms-bucket.s3.ap-northeast-2.amazonaws.com
+  credentials:
+    access-key: ENC(oSiKz9+8HE5iZxuumD8FTqRgXuEX89rhZlwZyRe/pVg=)
+    secret-key: ENC(qvocFVckoN2Mapf4J0ZPtvaY2AZ1AAYylbTt/oUVnUEZSwsNb1/xy+eHlnqQWySqvg4sdV3Jzwo=)
+  cloudfront:
+    domain: https://d1whgxjplw0vxh.cloudfront.net

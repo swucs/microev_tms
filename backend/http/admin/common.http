@@ -1,0 +1,32 @@
+### 로그인 : Admin
+POST {{admin}}/login
+Content-Type: application/json
+
+{
+  "email": "admin@obigo.com",
+  "password": "1234"
+}
+> {%
+    client.global.set("access-token", response.body.data.accessToken);
+    client.global.set("refresh-token", response.body.data.refreshToken);
+%}
+
+
+
+
+### 주소로 좌표구하기
+GET {{admin}}/common/coordinate?address=경기 성남시 분당구 판교원로 81번길 15
+Authorization: Bearer {{access-token}}
+
+### 주소로 읍면동 구하기
+GET {{admin}}/common/eupMyeonDong?address=연산제9동
+Authorization: Bearer {{access-token}}
+
+
+### 주소 검색
+GET https://dapi.kakao.com/v2/local/search/address.json?analyze_type=similar&page=1&size=10&query=경기 성남시 분당구 판교로
+Authorization: KakaoAK ed3f95501ad0db8bbce6bdd342edecb1
+
+
+### 주소 검색
+GET https://business.juso.go.kr/addrlink/addrLinkApi.do?currentPage=1&countPerPage=10&confmKey=TESTJUSOGOKR&resultType=json&keyword=경기성남시분당구판교원로81번길

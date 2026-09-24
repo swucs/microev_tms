@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- language.xml -->
+<mapper namespace="com.obigo.microev.tms.core.domain.mapper.VehicleMapper">
+    <sql id="columns">
+        vehicle_seq,
+        center_seq,
+        region_seq,
+        driver_seq,
+        vehicle_name,
+        model,
+        vehicle_type_cd,
+        vehicle_num,
+        vehicle_reg_num,
+        model_year,
+        vehicle_reg_area,
+        owner_name,
+        length,
+        width,
+        ton_grade,
+        max_loading_capacity,
+        fuel_type_cd,
+        fuel_efficiency,
+        vehicle_use_type_cd,
+        garage_name,
+        usage_yn,
+        created_at,
+        creator_seq,
+        modified_at,
+        modifier_seq
+    </sql>
+
+    <insert id="insert" parameterType="com.obigo.microev.tms.core.domain.entity.Vehicle">
+        <selectKey order="BEFORE" keyProperty="vehicleSeq" resultType="long">
+            SELECT
+            NEXTVAL('t_vehicle_vehicle_seq_seq'::regclass)
+        </selectKey>
+
+        INSERT INTO t_vehicle (
+            <include refid="columns"/>
+        )
+        VALUES (
+            #{vehicleSeq},
+            #{centerSeq},
+            #{regionSeq},
+            #{driverSeq},
+            #{vehicleName},
+            #{model},
+            #{vehicleTypeCd},
+            #{vehicleNum},
+            #{vehicleRegNum},
+            #{modelYear},
+            #{vehicleRegArea},
+            #{ownerName},
+            #{length},
+            #{width},
+            #{tonGrade},
+            #{maxLoadingCapacity},
+            #{fuelTypeCd},
+            #{fuelEfficiency},
+            #{vehicleUseTypeCd},
+            #{garageName},
+            #{usageYn},
+            #{createdAt},
+            #{creatorSeq},
+            #{modifiedAt},
+            #{modifierSeq}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.obigo.microev.tms.core.domain.entity.Vehicle">
+        UPDATE  t_vehicle
+        SET
+                center_seq = #{centerSeq},
+                region_seq = #{regionSeq},
+                driver_seq = #{driverSeq},
+                vehicle_name = #{vehicleName},
+                model = #{model},
+                vehicle_type_cd = #{vehicleTypeCd},
+                vehicle_num = #{vehicleNum},
+                vehicle_reg_num = #{vehicleRegNum},
+                model_year = #{modelYear},
+                vehicle_reg_area = #{vehicleRegArea},
+                owner_name = #{ownerName},
+                length = #{length},
+                width = #{width},
+                ton_grade = #{tonGrade},
+                max_loading_capacity = #{maxLoadingCapacity},
+                fuel_type_cd = #{fuelTypeCd},
+                fuel_efficiency = #{fuelEfficiency},
+                vehicle_use_type_cd = #{vehicleUseTypeCd},
+                garage_name = #{garageName},
+                usage_yn = #{usageYn},
+                modified_at = #{modifiedAt},
+                modifier_seq = #{modifierSeq}
+        WHERE   vehicle_seq = #{vehicleSeq}
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE
+        FROM    t_vehicle
+        WHERE   vehicle_seq = #{vehicleSeq}
+    </delete>
+
+    <select id="findById" parameterType="long" resultType="com.obigo.microev.tms.core.domain.entity.Vehicle">
+        SELECT
+                <include refid="columns"/>
+        FROM    t_vehicle
+        WHERE   vehicle_seq = #{vehicleSeq}
+    </select>
+
+    <select id="findByVehicleNum" parameterType="string" resultType="com.obigo.microev.tms.core.domain.entity.Vehicle">
+        SELECT
+        <include refid="columns"/>
+        FROM    t_vehicle
+        WHERE   vehicle_num = #{vehicleNum}
+    </select>
+
+    <select id="findByVehicleRegNum" parameterType="string" resultType="com.obigo.microev.tms.core.domain.entity.Vehicle">
+        SELECT
+        <include refid="columns"/>
+        FROM    t_vehicle
+        WHERE   vehicle_reg_num = #{vehicleRegNum}
+    </select>
+
+    <select id="findByDriverSeq" parameterType="long" resultType="com.obigo.microev.tms.core.domain.entity.Vehicle">
+        SELECT
+        <include refid="columns"/>
+        FROM    t_vehicle
+        WHERE   driver_seq = #{driverSeq}
+    </select>
+
+
+    <select id="findByConditions" parameterType="com.obigo.microev.tms.core.domain.mapper.vo.vehicle.SearchVehiclesCondition"
+            resultType="com.obigo.microev.tms.core.domain.mapper.vo.vehicle.SearchVehiclesResult">
+        SELECT
+                a.vehicle_seq,
+                a.center_seq,
+                b.center_name,
+                a.region_seq,
+                c.region_name,
+                a.driver_seq,
+                d.driver_name,
+                a.vehicle_name,
+                a.model,
+                a.vehicle_type_cd,
+                (SELECT com_code_name FROM t_common_code WHERE com_code_group_cd = 'VehicleType' AND com_code_cd = a.vehicle_type_cd) AS vehicle_type_cd_name,
+                a.vehicle_num,
+                a.vehicle_reg_num,
+                a.model_year,
+                a.vehicle_reg_area,
+                a.owner_name,
+                a.length,
+                a.width,
+                a.ton_grade,
+                a.max_loading_capacity,
+                a.fuel_type_cd,
+                (SELECT com_code_name FROM t_common_code WHERE com_code_group_cd = 'FuelType' AND com_code_cd = a.fuel_type_cd) AS fuel_type_cd_name,
+                a.fuel_efficiency,
+                a.vehicle_use_type_cd,
+                (SELECT com_code_name FROM t_common_code WHERE com_code_group_cd = 'VehicleUseType' AND com_code_cd = a.vehicle_use_type_cd) AS vehicle_use_type_cd_name,
+                a.garage_name,
+                a.usage_yn,
+                a.creator_seq,
+                e.admin_name AS creator_name,
+                a.created_at
+        FROM    t_vehicle   a
+        LEFT JOIN
+                t_center    b
+        ON      a.center_seq = b.center_seq
+        LEFT JOIN
+                t_region    c
+        ON      a.region_seq = c.region_seq
+        LEFT JOIN
+                t_driver    d
+        ON      a.driver_seq = d.driver_seq
+        LEFT JOIN
+                t_admin     e
+        ON      a.creator_seq = e.admin_seq
+        <where>
+            <if test="vehicleName != null and vehicleName != ''">
+                AND a.vehicle_name LIKE '%' || #{vehicleName} || '%'
+            </if>
+            <if test="centerName != null and centerName != ''">
+                AND b.center_name LIKE '%' || #{centerName} || '%'
+            </if>
+            <if test="vehicleTypeCd != null and vehicleTypeCd != ''">
+                AND a.vehicle_type_cd = #{vehicleTypeCd}
+            </if>
+        </where>
+        ORDER BY
+                a.created_at DESC
+    </select>
+
+    <select id="findByRegionSeq" parameterType="long"
+            resultType="com.obigo.microev.tms.core.domain.mapper.vo.vehicle.BelongingVehicleResult">
+        SELECT
+                a.vehicle_seq,
+                a.vehicle_name,
+                a.vehicle_num,
+                a.region_seq,
+                a.center_seq,
+                a.length,
+                a.width,
+                a.max_loading_capacity,
+                b.driver_name
+        FROM    t_vehicle   a
+        LEFT JOIN
+                t_driver    b
+        ON      a.driver_seq = b.driver_seq
+        WHERE   a.region_seq = #{regionSeq}
+    </select>
+
+
+    <select id="findByCenterSeq" parameterType="long"
+            resultType="com.obigo.microev.tms.core.domain.mapper.vo.vehicle.BelongingVehicleResult">
+        SELECT
+            a.vehicle_seq,
+            a.vehicle_name,
+            a.vehicle_num,
+            a.region_seq,
+            a.center_seq,
+            a.length,
+            a.width,
+            a.max_loading_capacity,
+            b.driver_seq,
+            b.driver_name
+        FROM    t_vehicle   a
+        LEFT JOIN
+                t_driver    b
+        ON      a.driver_seq = b.driver_seq
+        WHERE   a.center_seq = #{centerSeq}
+    </select>
+
+
+    <select id="findByCenterSeqAndEupMyeonDong"
+            resultType="com.obigo.microev.tms.core.domain.mapper.vo.vehicle.VehicleByEupMyeonDongResult">
+        SELECT
+                a.vehicle_seq,
+                a.vehicle_name,
+                a.region_seq,
+                c.region_name,
+                b.driver_name
+        FROM    t_vehicle   a
+        LEFT JOIN
+                t_driver    b
+        ON      a.driver_seq = b.driver_seq
+        INNER JOIN
+                t_region    c
+        ON      a.region_seq = c.region_seq
+        INNER JOIN
+                t_region_range  d
+        ON      c.region_seq = d.region_seq
+        WHERE   a.center_seq = #{centerSeq}
+        AND     d.eup_myeon_dong = #{eupMyeonDong}
+    </select>
+</mapper>

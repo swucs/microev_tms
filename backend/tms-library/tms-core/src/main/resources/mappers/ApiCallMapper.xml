@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- language.xml -->
+<mapper namespace="com.obigo.microev.tms.core.domain.mapper.ApiCallMapper">
+    <sql id="columns">
+        api_call_seq,
+        api_url,
+        http_method,
+        start_time,
+        end_time,
+        driver_seq,
+        response_code,
+        created_at
+    </sql>
+
+    <insert id="insert" parameterType="com.obigo.microev.tms.core.domain.entity.ApiCall">
+        <selectKey order="BEFORE" keyProperty="apiCallSeq" resultType="long">
+            SELECT
+            NEXTVAL('t_api_call_api_call_seq_seq'::regclass)
+        </selectKey>
+
+        INSERT INTO t_api_call (
+            <include refid="columns"/>
+        )
+        VALUES (
+            #{apiCallSeq},
+            #{apiUrl},
+            #{httpMethod},
+            #{startTime},
+            #{endTime},
+            #{driverSeq},
+            #{responseCode},
+            #{createdAt}
+        )
+    </insert>
+</mapper>

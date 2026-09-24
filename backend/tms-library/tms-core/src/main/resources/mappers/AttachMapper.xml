@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- language.xml -->
+<mapper namespace="com.obigo.microev.tms.core.domain.mapper.AttachMapper">
+
+    <sql id="attach">
+        attach_seq,
+        created_at,
+        creator_seq
+    </sql>
+
+    <insert id="insert" keyProperty="attachSeq" parameterType="com.obigo.microev.tms.core.domain.entity.Attach">
+        <selectKey order="BEFORE" keyProperty="attachSeq" resultType="long">
+            SELECT NEXTVAL('t_attach_attach_seq_seq'::regclass)
+        </selectKey>
+
+        INSERT INTO t_attach (
+            <include refid="attach"/>
+        )
+        VALUES (
+            #{attachSeq},
+            #{createdAt},
+            #{creatorSeq}
+        )
+    </insert>
+
+    <select id="findById" resultType="java.lang.Object">
+        SELECT
+                <include refid="attach"/>
+        FROM    t_attach
+        WHERE   attach_seq = #{attachSeq}
+    </select>
+
+
+</mapper>

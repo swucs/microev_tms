@@ -1,0 +1,80 @@
+### 로그인 : Admin
+POST {{admin}}/login
+Content-Type: application/json
+
+{
+  "email": "admin@obigo.com",
+  "password": "1234"
+}
+> {%
+    client.global.set("access-token", response.body.data.accessToken);
+    client.global.set("refresh-token", response.body.data.refreshToken);
+%}
+
+
+### 배송기사 목록조회
+GET {{admin}}/driver?driverName=&centerName=&statusCd=
+Authorization: Bearer {{access-token}}
+
+
+### 배송기사 목록조회 검색
+GET {{admin}}/driver?driverName=기사
+Authorization: Bearer {{access-token}}
+
+
+### 배송기사 등록
+POST {{admin}}/driver
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+{
+"driverName": "김여사",
+"centerSeq": 1,
+"loginId": "driver03",
+"password": "1234",
+"extSystemLinkedId": "lotte_driver03",
+"driverPhoneNum": "010-1234-5678",
+"email": "test2@obigo.com",
+"driverLicenseNum": "11-02-33333",
+"driverLicenseDate": "2023-01-01",
+"driverLicenseAgency": "운전면허 발급기관",
+"compName": "오비고",
+"workingDays": "월화수목금",
+"workingStartHour": "10:00",
+"workingEndHour": "15:00",
+"statusCd": "WORKING"
+}
+
+### 배송기사 수정
+PUT {{admin}}/driver/3
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+{
+  "centerSeq": 2,
+  "extSystemLinkedId": "lotte_driver03",
+  "driverPhoneNum": "010-4321-4321",
+  "email": "test3@obigo.com",
+  "driverLicenseNum": "11-02-44444",
+  "driverLicenseDate": "2024-01-01",
+  "driverLicenseAgency": "서울경찰청",
+  "compName": "롯데",
+  "workingDays": "화수목금",
+  "workingStartHour": "10:00",
+  "workingEndHour": "17:00",
+  "statusCd": "WORKING"
+}
+
+### 배송기사 비밀번호 수정
+PUT {{admin}}/driver/3/password
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+{
+  "password": "1234"
+}
+
+### 배송기사 삭제
+DELETE {{admin}}/driver/3
+Content-Type: application/json
+Authorization: Bearer {{access-token}}

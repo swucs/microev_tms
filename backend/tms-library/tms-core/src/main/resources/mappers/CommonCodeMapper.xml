@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- language.xml -->
+<mapper namespace="com.obigo.microev.tms.core.domain.mapper.CommonCodeMapper">
+    <sql id="columnsCommonCode">
+        com_code_seq,
+        com_code_group_cd,
+        com_code_cd,
+        com_code_name,
+        sort_order,
+        usage_yn,
+        attribute1,
+        attribute2,
+        attribute3,
+        created_at,
+        creator_seq,
+        modified_at,
+        modifier_seq
+    </sql>
+
+    <delete id="deleteByComCodeGroupCd" parameterType="String">
+        /** CommonCodeMapper.deleteByComCodeGroupCd */
+        DELETE
+        FROM
+                t_common_code
+        WHERE
+                com_code_group_cd = #{comCodeGroupCd}
+    </delete>
+
+    <select id="findValidCodes"
+            resultType="com.obigo.microev.tms.core.domain.mapper.vo.commonCode.ValidCommonCodesResult">
+        SELECT
+                com_code_group_cd,
+                com_code_cd,
+                com_code_name,
+                sort_order
+        FROM    t_common_code
+        WHERE   usage_yn = 'Y'
+        <if test="comCodeGroupCd != null and comCodeGroupCd != ''">
+            AND com_code_group_cd = #{comCodeGroupCd}
+        </if>
+        <if test="comCodeCd != null and comCodeCd != ''">
+            AND com_code_cd = #{comCodeCd}
+        </if>
+        ORDER BY
+                com_code_group_cd,
+                sort_order
+    </select>
+
+
+    <select id="findByComCodeGroupCd" parameterType="String"
+            resultType="com.obigo.microev.tms.core.domain.entity.CommonCode">
+        /** CommonCodeMapper.findByComCodeGroupCd */
+        SELECT
+                <include refid="columnsCommonCode"/>
+        FROM    t_common_code
+        WHERE   com_code_group_cd = #{comCodeGroupCd}
+        ORDER BY
+                sort_order ASC
+    </select>
+
+    <select id="findById" parameterType="Long" resultType="com.obigo.microev.tms.core.domain.entity.CommonCode">
+        /** CommonCodeMapper.findById */
+        SELECT
+        <include refid="columnsCommonCode"/>
+        FROM    t_common_code
+        WHERE   com_code_seq = #{comCodeSeq}
+    </select>
+
+
+    <insert id="insertCommonCode" parameterType="com.obigo.microev.tms.core.domain.entity.CommonCode">
+        <selectKey order="BEFORE" keyProperty="comCodeSeq" resultType="long">
+            SELECT
+                    NEXTVAL('t_common_code_com_code_seq_seq'::regclass)
+        </selectKey>
+
+        INSERT INTO t_common_code (
+            <include refid="columnsCommonCode"/>
+        )
+        VALUES (
+            #{comCodeSeq},
+            #{comCodeGroupCd},
+            #{comCodeCd},
+            #{comCodeName},
+            #{sortOrder},
+            #{usageYn},
+            #{attribute1},
+            #{attribute2},
+            #{attribute3},
+            #{createdAt},
+            #{creatorSeq},
+            #{modifiedAt},
+            #{modifierSeq}
+        )
+    </insert>
+
+
+    <update id="updateCommonCode" parameterType="com.obigo.microev.tms.core.domain.entity.CommonCode">
+        UPDATE t_common_code
+        SET
+                com_code_cd         = #{comCodeCd},
+                com_code_name       = #{comCodeName},
+                sort_order          = #{sortOrder},
+                usage_yn            = #{usageYn},
+                attribute1          = #{attribute1},
+                attribute2          = #{attribute2},
+                attribute3          = #{attribute3},
+                modified_at         = #{modifiedAt},
+                modifier_seq        = #{modifierSeq}
+        WHERE
+                com_code_seq        = #{comCodeSeq}
+    </update>
+
+
+
+    <delete id="deleteById" parameterType="Long">
+        DELETE
+        FROM    t_common_code
+        WHERE   com_code_seq = #{comCodeSeq}
+    </delete>
+
+</mapper>
