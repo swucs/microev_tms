@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# 로컬 전용 HTTP 클라이언트 환경 (실키 보관, 커밋 금지)
+http/http-client.private.env.json

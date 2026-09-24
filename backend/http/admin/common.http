@@ -23,9 +23,9 @@ GET {{admin}}/common/eupMyeonDong?address=연산제9동
 Authorization: Bearer {{access-token}}
 
 
-### 주소 검색
+### 주소 검색 (카카오 직접 호출용, 키는 http-client.env.json의 kakao-rest-key에 입력)
 GET https://dapi.kakao.com/v2/local/search/address.json?analyze_type=similar&page=1&size=10&query=경기 성남시 분당구 판교로
-Authorization: KakaoAK ed3f95501ad0db8bbce6bdd342edecb1
+Authorization: KakaoAK {{kakao-rest-key}}
 
 
 ### 주소 검색

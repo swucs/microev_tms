@@ -27,7 +27,7 @@ spring:
       on-profile: local
 external:
   kakao-api:
-    key: "ENC(NYOhdVxUIopB5z/+HSpxUIQQr2OV5YMM)"
+    key: "ENC(Qh9p9r5ZoBc2XLkGV8hRjnqdiEanFxnzGzQfOCGroftJxpJIu73wdIh8TGtGspGR)"
 ---
 spring:
   config:
